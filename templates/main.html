@@ -1,0 +1,229 @@
+{% load static %}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<form action="" method="post">
+    {% csrf_token %}
+    <input type="text" id="test" name="test" placeholder="input ip address">
+    <button onclick="submit()">click</button>
+</form>
+{% if ip != "-" %}
+<pre>
+    {{ ip }} {
+        'ip': '13.224.163.59',
+        'location': {
+            'country': 'Hong Kong',
+            'iso': 'HK',
+            'region': 'Central and Western District',
+            'city': 'Hong Kong',
+            'latitude': 22.27832,
+            'longitude': 114.17469,
+            'timezone': 'Asia/Hong_Kong',
+        },
+        'network': {
+            'asn': 16509,
+            'name': 'AMAZON-02',
+            'route': '13.224.160.0/21',
+            'domain': 'http://www.amazon.com',
+            'DNS': 'server-13-224-163-59.hkg54.r.cloudfront.net',
+            'type': 'Enterprise'
+        },
+        'isp': 'Amazon.com, Inc.',
+        'organization': {
+            'orgId': 'AMAZON-4',
+            'orgName': 'Amazon.com, Inc.',
+            'location{
+                'country': 'US',
+                'city': 'Seattle',
+                'address'1918 8th Ave',
+                'postal': '98101-1244'
+            },
+            'email': 'aws-routing-poc@amazon.com'
+        },
+        'reg_info': {
+            'asn': 16509,
+            'iso': 'US',
+            'country': 'United States',
+            'latitude': 37.751,
+            'longitude': -97.822,
+            'accuracy_radius': 1000
+        }
+    }
+<iframe src="http://localhost:5601/app/dashboards#/view/017708e0-a367-11ec-a5ad-391189656492?embed=true&_g=(filters%3A!()%2Cquery%3A(language%3Akuery%2Cquery%3A'')%2CrefreshInterval%3A(pause%3A!t%2Cvalue%3A0)%2Ctime%3A(from%3Anow-1y%2Cto%3Anow))&hide-filter-bar=true" height="600" width="800"></iframe>
+<!--
+    host1 {
+    'ip': '94.101.60.146',
+    'location': {
+        'country': 'Italy',
+        'iso': 'IT',
+        'region': 'Campania',
+        'city': 'Olevano sul Tusciano',
+        'latitude': 40.6572,
+        'longitude': 15.023,
+        'timezone': 'Europe/Rome'},
+    'network': {
+        'asn': 39120,
+        'name': 'CONVERGENZE-AS',
+        'route': '94.101.60.0/22',
+        'domain': 'http://www.convergenze.it',
+        'DNS': 'host146-60-101-94.convergenze.it   ',
+        'type': 'Cable/DSL/ISP'},
+    'isp': 'CONVERGENZE',
+    'organization': {
+        'orgId': 'Convergenze S.p.A',
+        'orgName': 'Convergenze S.p.A',
+        'location{
+            'country': 'IT',
+            'city': 'Milan',
+            'address': 'Via Magna Graecia 136',
+            'postal': '84040'},
+        'email': 'rpingar@convergenze.it'},
+    'reg_info': {
+        'asn': 39120,
+        'iso': 'IT',
+        'country': 'Italy',
+        'latitude': 40.6125,
+        'longitude': 14.9806,
+        'accuracy_radius': 50}
+}
+    -->
+</pre>
+{% else %}
+    input IP and Click button
+{% endif %}
+<div id="mynetwork" style="border: 1px solid black; width: 50%; height:800px">
+        <canvas width="400" height="600"></canvas>
+</div>
+
+<script src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+<script>
+
+    var nodes = null;
+    var edges = null;
+    var network = null;
+
+    var DIR = "{% static 'img/refresh-cl/'%}";
+    var EDGE_LENGTH_MAIN = 150;
+    var EDGE_LENGTH_SUB = 50;
+    x = 0
+    y = 0
+    // Called when the Visualization API is loaded.
+    function draw() {
+        // Create a data table with nodes.
+        nodes = [];
+
+        // Create a data table with links.
+        edges = [];
+
+        nodes.push({
+            id: 1,
+            label: "Main",
+            fixed: true,
+            x: x+=100,
+            y: y+=50,
+            image: DIR + "Network-Pipe-icon.png",
+            shape: "image",
+        });
+        nodes.push({
+            id: 2,
+            label: "Office",
+            fixed: true,
+            x: x+=100,
+            y: y+=50,
+            image: DIR + "Network-Pipe-icon.png",
+            shape: "image",
+        });
+        nodes.push({
+            id: 3,
+            label: "Wireless",
+            fixed: true,
+            image: DIR + "Network-Pipe-icon.png",
+            shape: "image",
+        });
+        edges.push({ from: 1, to: 2, length: EDGE_LENGTH_MAIN });
+        edges.push({ from: 1, to: 3, length: EDGE_LENGTH_MAIN });
+
+        for (var i = 4; i <= 7; i++) {
+            nodes.push({
+                id: i,
+                label: "Computer",
+                fixed: true,
+                x: x+=100,
+                y: y+=50,
+                image: DIR + "pc.png",
+                shape: "image",
+            });
+            edges.push({ from: 2, to: i, length: EDGE_LENGTH_SUB });
+        }
+
+        nodes.push({
+            id: 101,
+            label: "Printer",
+            image: DIR + "Hardware-Printer-Blue-icon.png",
+            fixed: true,
+            x: x+=100,
+            y: y+=50,
+            shape: "image",
+        });
+        edges.push({ from: 2, to: 101, length: EDGE_LENGTH_SUB });
+
+        nodes.push({
+            id: 102,
+            label: "Laptop",
+            fixed: true,
+            x: x+=100,
+            y: y+=50,
+            image: DIR + "Hardware-Laptop-1-icon.png",
+            shape: "image",
+        });
+        edges.push({ from: 3, to: 102, length: EDGE_LENGTH_SUB });
+
+        nodes.push({
+            id: 103,
+            label: "network drive",
+            fixed: true,
+            x: x+=100,
+            y: y+=50,
+            image: DIR + "Network-Drive-icon.png",
+            shape: "image",
+        });
+        edges.push({ from: 1, to: 103, length: EDGE_LENGTH_SUB });
+
+        nodes.push({
+            id: 104,
+            label: "Internet",
+            fixed: true,
+            x: x+=100,
+            y: y+=50,
+            image: DIR + "System-Firewall-2-icon.png",
+            shape: "image",
+        });
+        edges.push({ from: 1, to: 104, length: EDGE_LENGTH_SUB });
+
+        for (var i = 200; i <= 201; i++) {
+            nodes.push({
+                id: i,
+                label: "Smartphone",
+                fixed: true,
+                x: x+=100,
+                y: y+=50,
+                image: DIR + "Hardware-My-PDA-02-icon.png",
+                shape: "image",
+            });
+            edges.push({ from: 3, to: i, length: EDGE_LENGTH_SUB });
+        }
+
+        // create a network
+        var container = document.getElementById("mynetwork");
+        var data = {
+            nodes: nodes,
+            edges: edges,
+        };
+        var options = {};
+        network = new vis.Network(container, data, options);
+    }
+
+    document.addEventListener("DOMContentLoaded", function(){
+        draw()
+    });
+
+
+</script>
