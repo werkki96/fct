@@ -2,7 +2,7 @@ from django.shortcuts import render
 
 
 # create your views here.
-def main_page(request):
+def index(request):
     ipChk = request.POST.get("test")
     if ipChk is None:
         print("None22")
@@ -10,10 +10,13 @@ def main_page(request):
     else:
         print(request.POST.get("test"))
 
+    m_key = 'AIzaSyBSCfYSvhqS17N9skfLIzThSVNea5mvEBs'
+
     context = {
         'ip': ipChk,
+        'm_keys': m_key,
     }
-    response = render(request, 'main.html', context)
+    response = render(request, 'GeoMap.html', context)
     return response
 
 
