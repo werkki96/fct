@@ -23,16 +23,16 @@
                                         <td><span class="text-light font-weight-bold">원자력 발전소</span></td>
                                     </tr>
                                     <tr>
-                                        <td style="width:20%"><img src="{% static "img/icons/nuclear.png" %}" alt=""></td>
-                                        <td><span class="text-light font-weight-bold">...</span></td>
+                                        <td style="width:20%"><img src="{% static "img/icons/factory.png" %}" alt=""></td>
+                                        <td><span class="text-light font-weight-bold">산업공장</span></td>
                                     </tr>
                                     <tr>
-                                        <td style="width:20%"><img src="{% static "img/icons/nuclear.png" %}" alt=""></td>
-                                        <td><span class="text-light font-weight-bold">,,,</span></td>
+                                        <td style="width:20%"><img src="{% static "img/icons/missile.png" %}" alt=""></td>
+                                        <td><span class="text-light font-weight-bold">군수공장</span></td>
                                     </tr>
                                     <tr>
-                                        <td style="width:20%"><img src="{% static "img/icons/nuclear.png" %}" alt=""></td>
-                                        <td><span class="text-light font-weight-bold">ddd</span></td>
+                                        <td style="width:20%"><img src="{% static "img/icons/school.png" %}" alt=""></td>
+                                        <td><span class="text-light font-weight-bold">학교</span></td>
                                     </tr>
                                 </table>
                                 <table class="table">
@@ -46,12 +46,12 @@
                                         <td><span class="text-light font-weight-bold">PC</span></td>
                                     </tr>
                                     <tr>
-                                        <td style="width:20%"><img src="{% static "img/icons/PC.png" %}" alt=""></td>
-                                        <td><span class="text-light font-weight-bold">,,,</span></td>
+                                        <td style="width:20%"><img src="{% static "img/icons/router.png" %}" alt=""></td>
+                                        <td><span class="text-light font-weight-bold">Router</span></td>
                                     </tr>
                                     <tr>
-                                        <td style="width:20%"><img src="{% static "img/icons/PC.png" %}" alt=""></td>
-                                        <td><span class="text-light font-weight-bold">...</span></td>
+                                        <td style="width:20%"><img src="{% static "img/icons/server.png" %}" alt=""></td>
+                                        <td><span class="text-light font-weight-bold">Server</span></td>
                                     </tr>
                                 </table>
                             </div>
@@ -71,16 +71,16 @@
                 <div class="col-md-12 col-xl-3 grid-margin stretch-card">
                     <div class="card">
                         <div class="card-body" style="flex:0.01 1;">
-                            <h3 class="card-title">연변 우라늄 농축시설</h3>
+                            <h3 class="card-title">김일성 종합대학</h3>
                         </div>
                         <hr style="background-color: white;">
                         <div class="card-body" style="flex:0.05 1;">
                             <h4 class="card-title text-info">주소</h4>
-                            <span class="text-light">북한 KP 평안 북도 녕변군</span>
+                            <span class="text-light">조선민주주의인민공화국 평양 직할시 평양</span>
                         </div>
                         <div class="card-body" style="flex:0.05 1;">
                             <h4 class="card-title text-info">위경도</h4>
-                            <span class="text-light">39.058345, 125.768266</span>
+                            <span class="text-light">39.058678662262984, 125.76824421680736</span>
                         </div>
                         <div class="card-body" style="flex:0.05 1;">
                             <h4 class="card-title text-info">외부 IP 대역대</h4>
@@ -92,19 +92,42 @@
                         </div>
                         <div class="card-body" style="flex:0.05 1;">
                             <h4 class="card-title text-info">네트워크 구조 가시화</h4>
-                            <a class="text-primary">[자세히]</a>
+                            <a class="text-primary" data-toggle="modal" data-target="#detailNetworks" style="cursor:pointer;">[자세히]</a>
                         </div>
                         <div class="card-body" style="flex:0.05 1;">
                             <h4 class="card-title text-info">기타</h4>
                             <p>
-                                <a class="text-primary">http://10.240.100.11</a>
+                                <a class="text-primary">http://www.ryongnamsan.edu.kp/</a>
                             </p>
-                            <img src="https://gdb.voanews.com/9ABB1ED8-D37D-4AA9-A7F5-D91C7A3004BC_w408_r1_s.jpg" alt="">
+                            <img src="https://img3.yna.co.kr/photo/yna/YH/2016/09/29/PYH2016092927520001300_P4.jpg" alt="" width="500" >
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+
+        <!-- modals -->
+        <div class="modal fade" id="detailNetworks" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">연변 우라늄 농축시설 네트워크</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div class="modal-body">
+                  <!--네트워크 접점 및 노드 가시화-->
+                  <div> </div>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary">Save changes</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- /modals -->
         <!-- content-wrapper ends -->
         <!-- partial:partials/_footer.html -->
         <footer class="footer">
@@ -124,10 +147,11 @@
         // Initialize and add the map
         function initMap() {
             // The location of Uluru
-            const target = [{ lat: 39.058345, lng: 125.768266 }, { lat: 39.078345, lng: 125.768266 }, { lat: 39.098345, lng: 125.798266 }, { lat: 39.058345, lng: 125.708266 }];
+            // 37.63124, 127.2899 (seoul), 34.26658239342853, 27.4673394037323, 112.0221605275621(후난성), 23.639397214043683, 81.15063376483022(인도 어딘가), 39.058678662262984, 125.76824421680736(김일성종합대학)
+            const target = [{ lat: 37.63124, lng: 127.2899 }, { lat: 27.4673394037323, lng: 112.0221605275621 }, { lat: 23.639397214043683, lng: 81.15063376483022 }, { lat: 39.058678662262984, lng: 125.76824421680736 }];
             // The map, centered at Uluru
             const map = new google.maps.Map(document.getElementById("map"), {
-                zoom: 12,
+                zoom: 4,
                 center: target[0],
                 styles: map_styles,
             });
@@ -140,18 +164,39 @@
                     anchor: new google.maps.Point(17, 34),
                     scaledSize: new google.maps.Size(30, 30),
                 },
-                n_nuclear: {
+                n_school: {
                     url: "{% static "img/icons/nuclear_negative.png" %}",
                     size: new google.maps.Size(90, 90),
                     origin: new google.maps.Point(0, 0),
                     anchor: new google.maps.Point(17, 34),
-                    scaledSize: new google.maps.Size(30, 30),
+                    scaledSize: new google.maps.Size(40, 40),
+                },
+                school: {
+                    url: "{% static "img/icons/school_negative.png" %}",
+                    size: new google.maps.Size(90, 90),
+                    origin: new google.maps.Point(0, 0),
+                    anchor: new google.maps.Point(17, 34),
+                    scaledSize: new google.maps.Size(40, 40),
                 },
                 pc: {
                     url: "{% static "img/icons/PC.png" %}",
                     size: new google.maps.Size(71, 71),
                     origin: new google.maps.Point(0, 0),
                     anchor: new google.maps.Point(17, 34),
+                    scaledSize: new google.maps.Size(25, 25)
+                },
+                server: {
+                    url: "{% static "img/icons/server.png" %}",
+                    size: new google.maps.Size(100, 120),
+                    origin: new google.maps.Point(0, 0),
+                    anchor: new google.maps.Point(17, 34),
+                    scaledSize: new google.maps.Size(40, 40)
+                },
+                router: {
+                    url: "{% static "img/icons/router.png" %}",
+                    size: new google.maps.Size(71, 71),
+                    origin: new google.maps.Point(0, 0),
+                    anchor: new google.maps.Point(15, 30),
                     scaledSize: new google.maps.Size(25, 25)
                 }
             }
@@ -163,24 +208,24 @@
             });
             {# 마커 위치 #}
             const markers = [
-                new google.maps.Marker({
-                    position: target[0],
-                    icon: icons['n_nuclear'],
-                    map: map,
-                }),
-                new google.maps.Marker({
-                    position: target[1],
-                    icon: icons['pc'],
-                    map: map,
-                }),
-                new google.maps.Marker({
-                    position: target[2],
-                    icon: icons['pc'],
-                    map: map,
-                }),
+                {#new google.maps.Marker({#}
+                {#    position: target[0],#}
+                {#    icon: icons['pc'],#}
+                {#    map: map,#}
+                {#}),#}
+                {#new google.maps.Marker({#}
+                {#    position: target[1],#}
+                {#    icon: icons['router'],#}
+                {#    map: map,#}
+                {#}),#}
+                {#new google.maps.Marker({#}
+                {#    position: target[2],#}
+                {#    icon: icons['pc'],#}
+                {#    map: map,#}
+                {#}),#}
                 new google.maps.Marker({
                     position: target[3],
-                    icon: icons['pc'],
+                    icon: icons['ㅁ'],
                     map: map,
                 })
             ]
@@ -196,12 +241,7 @@
                 });
             }
             {# 연결정보 선그리기 #}
-            const flightPlanCoordinates = [
-                { lat: 37.772, lng: -122.214 },
-                { lat: 21.291, lng: -157.821 },
-                { lat: -18.142, lng: 178.431 },
-                { lat: -27.467, lng: 153.027 },
-            ];
+
             const flightPath = new google.maps.Polyline({
                 path: target,
                 geodesic: true,
