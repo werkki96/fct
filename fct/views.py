@@ -26,9 +26,10 @@ def inner_network(request):
         ipChk = "-"
     else:
         print(request.POST.get("ip"))
-
+    m_key = 'AIzaSyBSCfYSvhqS17N9skfLIzThSVNea5mvEBs'
     context = {
         'ip': ipChk,
+        'm_keys': m_key,
     }
     response = render(request, 'InnerNetwork.html', context)
     return response
