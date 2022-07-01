@@ -303,6 +303,7 @@
             [255, 0, 0],
             [0, 0, 255], // vendor #1
         ];
+        let a;
         hide = null;
         show = null;
         flag = false;
@@ -331,6 +332,38 @@
                 shadowEnabled: false,
             };
             const overlay = new GoogleMapsOverlay({});
+            const animate = () => {
+                currentTime = (currentTime + 1) % loop_length;
+
+                const tripsLayer = new TripsLayer({
+                    ...props,
+                    currentTime,
+                });
+                if(map.getZoom() < 10) {
+                    overlay.setProps({
+                        layers: [tripsLayer],
+                    });
+                    if (currentTime == JSONS.responseJSON[0].timestamps[j]) {
+                        show(j)
+                        if (j > 0 && j < JSONS.responseJSON[0].timestamps.length) {
+                            threat_type = "네트워크 경유"
+                            if (j == JSONS.responseJSON[0].timestamps.length - 1) threat_type = "위협발생"
+                            $('#tb_threat_log').append(AddLog(JSONS.responseJSON[0].location[j - 1], JSONS.responseJSON[0].location[j], threat_type))
+                        }
+                        if (j > 1) markers[j - 2].setMap(null);
+                        markers[j++].setAnimation(google.maps.Animation.BOUNCE)
+
+                    } else if (currentTime == loop_length - 1) {
+                        for (let i = 0; i < markers.length; i++) {
+                            markers[i].setMap(null);
+                        }
+                        $('#tb_threat_log').html('');
+                        j = 0;
+                    }
+                }
+                window.requestAnimationFrame(animate);
+            }
+
             let j = 0;
             $('#tb_threat_log').text('')
 
@@ -386,7 +419,7 @@
                     hideAll(markers2)
                 }
             });
-
+            a = overlay;
             {# 클릭이벤트 추가 #}
             {#for (i=0;i<4;i++) {#}
             {#    markers[i].addListener("click", () => {#}
@@ -397,37 +430,7 @@
             {#        });#}
             {#    });#}
             //}
-            const animate = () => {
-                currentTime = (currentTime + 1) % loop_length;
 
-                const tripsLayer = new TripsLayer({
-                    ...props,
-                    currentTime,
-                });
-                overlay.setProps({
-                    layers: [tripsLayer],
-                });
-                if(map.getZoom() < 10) {
-                    if (currentTime == JSONS.responseJSON[0].timestamps[j]) {
-                        show(j)
-                        if (j > 0 && j < JSONS.responseJSON[0].timestamps.length) {
-                            threat_type = "네트워크 경유"
-                            if (j == JSONS.responseJSON[0].timestamps.length - 1) threat_type = "위협발생"
-                            $('#tb_threat_log').append(AddLog(JSONS.responseJSON[0].location[j - 1], JSONS.responseJSON[0].location[j], threat_type))
-                        }
-                        if (j > 1) markers[j - 2].setMap(null);
-                        markers[j++].setAnimation(google.maps.Animation.BOUNCE)
-
-                    } else if (currentTime == loop_length - 1) {
-                        for (let i = 0; i < markers.length; i++) {
-                            markers[i].setMap(null);
-                        }
-                        $('#tb_threat_log').html('');
-                        j = 0;
-                    }
-                }
-                window.requestAnimationFrame(animate);
-            }
             window.requestAnimationFrame(animate);
 
             overlay.setMap(map);
