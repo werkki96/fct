@@ -69,14 +69,14 @@
                                         <td><span class="text-summary font-weight-bold">네트워크 이동</span></td>
                                     </tr>
                                 </table>
-{#                                <div id="logArea" class="row">#}
-{#                                    <div class="col-md-8 col-xl-8 ">#}
-{#                                        <span class="text-danger text-left">서울 ------------------------>중국</span>#}
-{#                                    </div>#}
-{#                                    <div class="col-md-4 col-xl-4">#}
-{#                                        <span class="text-secondary font-weight-bold">네트워크 이동</span>#}
-{#                                    </div>#}
-{#                                </div>#}
+                                {#                                <div id="logArea" class="row">#}
+                                {#                                    <div class="col-md-8 col-xl-8 ">#}
+                                {#                                        <span class="text-danger text-left">서울 ------------------------>중국</span>#}
+                                {#                                    </div>#}
+                                {#                                    <div class="col-md-4 col-xl-4">#}
+                                {#                                        <span class="text-secondary font-weight-bold">네트워크 이동</span>#}
+                                {#                                    </div>#}
+                                {#                                </div>#}
                             </div>
                         </div>
                     </div>
@@ -297,22 +297,24 @@
         const JSONS = $.getJSON(DATA_URL)
         {#const LOOP_LENGTH =#}
         let map = null;
-        let markers = null
+        let markers = []
+        let markers2 = []
         const VENDOR_COLORS = [
             [255, 0, 0],
             [0, 0, 255], // vendor #1
         ];
         hide = null;
         show = null;
+        flag = false;
         // Initialize and add the map
-        function initMap() {
+        function initMap(listener) {
             // 37.63124, 127.2899 (seoul), 27.4673394037323, 112.0221605275621(후난성), 23.639397214043683, 81.15063376483022(인도 어딘가), 39.058678662262984, 125.76824421680736(김일성종합대학)
             const target = [{ lat: 37.63124, lng: 127.2899 }, { lat: 27.4673394037323, lng: 112.0221605275621 }, { lat: 23.639397214043683, lng: 81.15063376483022 }, { lat: 39.058678662262984, lng: 125.76824421680736 }];
             loop_length = JSONS.responseJSON[0].timestamps[JSONS.responseJSON[0].timestamps.length-1]+100
             map = new google.maps.Map(document.getElementById("map"), {
                 zoom: 4,
                 center: target[0],
-                styles: map_styles,
+                {#styles: map_styles,#}
             });
             {# animate map #}
             let currentTime = 0;
@@ -329,86 +331,61 @@
                 shadowEnabled: false,
             };
             const overlay = new GoogleMapsOverlay({});
-            let i = 0;
+            let j = 0;
             $('#tb_threat_log').text('')
-            const animate = () => {
-                currentTime = (currentTime + 1) % loop_length;
 
-                const tripsLayer = new TripsLayer({
-                    ...props,
-                    currentTime,
-                });
-                overlay.setProps({
-                    layers: [tripsLayer],
-                });
-                if(currentTime == JSONS.responseJSON[0].timestamps[i]) {
-                    show(i)
-                    if(i > 0 && i < JSONS.responseJSON[0].timestamps.length) {
-                        threat_type = "네트워크 경유"
-                        if(i == JSONS.responseJSON[0].timestamps.length-1) threat_type = "위협발생"
-console.log(JSONS.responseJSON[0])
-                        $('#tb_threat_log').append(AddLog(JSONS.responseJSON[0].location[i-1], JSONS.responseJSON[0].location[i], threat_type))
-                    }
-                    if(i > 1) markers[i-2].setMap(null);
-                    markers[i++].setAnimation(google.maps.Animation.BOUNCE)
-
-                } else if(currentTime == loop_length-1) {
-                    for (let i = 0; i < markers.length; i++) {
-                        markers[i].setMap(null);
-                    }
-                     $('#tb_threat_log').html('');
-                    i = 0;
-                }
-                window.requestAnimationFrame(animate);
-            }
-            markers = [
-                new google.maps.Marker({
-                    position: target[0],
-                    icon: icons(google)['pc'],
-                    map: map,
-                    label: {
-                        text: "Hello World",
-                        color: "#FFFFFF",
-                        fontWeight: "bold",
-                        fontSize: "16px",
-                        className: "map-label"
-                    },
-                }),
-                new google.maps.Marker({
-                    position: target[1],
-                    icon: icons(google)['router'],
-                    map: map,
-                }),
-                new google.maps.Marker({
-                    position: target[2],
-                    icon: icons(google)['pc'],
-                    map: map,
-                }),
-                new google.maps.Marker({
-                    position: target[3],
-                    icon: icons(google)['ㅁ'],
-                    map: map,
-                }),
-            ];
+            {# new create markers #}
+            if(map.getZoom() < 10)  markers = newMarkers(JSONS.responseJSON[0].location.length, JSONS.responseJSON[0].location, target)
 
             hide = function (index) {
                 markers[index].setMap(null);
             }
-            for (let i = 0; i < markers.length; i++) {
-                markers[i].setMap(null);
+            hideAll = function (mark) {
+                for (let i = 0; i < mark.length; i++) {
+                    mark[i].setMap(null);
+                }
             }
-
             show = function (index) {
                 markers[index].setMap(map);
             }
+            hideAll(markers)
+
+
             {# 마커 클릭시 텍스트 정의 #}
             const contentString = "<span class='text-black'>test one 2 three</span>";
             const infowindow = new google.maps.InfoWindow({
                 content: contentString,
                 maxWidth: 200,
             });
-            {# 마커 위치 #}
 
+            {# marker zoom up event #}
+            markers[markers.length-1].addListener("click", (e) => {
+                map.setCenter(markers[markers.length-1].getPosition());
+                animateMapZoomTo(map, 18)
+                map.setZoom(18)
+                hideAll(markers)
+            });
+
+            {# marker zoom up event #}
+            map.addListener("zoom_changed", (e) => {
+                if(map.zoom > 14) {
+                    markers2 = newMarkers(5, ["종합대학","혁명사적관","학생빌딩","과학도서관",".."], [target[3],
+                        {lat:39.05807855450129, lng:125.76711363450084},
+                        {lat:39.05934347236878, lng:125.77019746627538},
+                        {lat:39.05628854814572, lng:125.7673594819969},
+                        {lat:39.05695679415487, lng:125.77108898847766}]);
+                    console.log(markers2, "22")
+                    for (i=0;i<markers2.length;i++) {
+                        markers2[i].setMap(map)
+                    }
+                } else if (map.zoom < 10) {
+                    hideAll(markers2)
+                    markers = newMarkers(JSONS.responseJSON[0].location.length, JSONS.responseJSON[0].location, target)
+                }else {
+                    hideAll(markers)
+                    hideAll(markers2)
+                }
+            });
 
             {# 클릭이벤트 추가 #}
             {#for (i=0;i<4;i++) {#}
@@ -420,8 +397,39 @@ console.log(JSONS.responseJSON[0])
             {#        });#}
             {#    });#}
             //}
+            const animate = () => {
+                currentTime = (currentTime + 1) % loop_length;
 
+                const tripsLayer = new TripsLayer({
+                    ...props,
+                    currentTime,
+                });
+                overlay.setProps({
+                    layers: [tripsLayer],
+                });
+                if(map.getZoom() < 10) {
+                    if (currentTime == JSONS.responseJSON[0].timestamps[j]) {
+                        show(j)
+                        if (j > 0 && j < JSONS.responseJSON[0].timestamps.length) {
+                            threat_type = "네트워크 경유"
+                            if (j == JSONS.responseJSON[0].timestamps.length - 1) threat_type = "위협발생"
+                            $('#tb_threat_log').append(AddLog(JSONS.responseJSON[0].location[j - 1], JSONS.responseJSON[0].location[j], threat_type))
+                        }
+                        if (j > 1) markers[j - 2].setMap(null);
+                        markers[j++].setAnimation(google.maps.Animation.BOUNCE)
+
+                    } else if (currentTime == loop_length - 1) {
+                        for (let i = 0; i < markers.length; i++) {
+                            markers[i].setMap(null);
+                        }
+                        $('#tb_threat_log').html('');
+                        j = 0;
+                    }
+                }
+                window.requestAnimationFrame(animate);
+            }
             window.requestAnimationFrame(animate);
+
             overlay.setMap(map);
         }
         window.initMap = initMap;

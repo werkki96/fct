@@ -144,6 +144,36 @@ function AddLog(startLoc, endLoc, type){
     type_td.innerText = type;
     tr.appendChild(location_td)
     tr.appendChild(type_td)
-    console.log(tr)
     return tr;
+}
+
+
+function newMarkers(length, markerText, positions, map){
+    markers = [];
+    for (let i = 0; i < length; i++) {
+        markers.push(new google.maps.Marker({
+            position: positions[i],
+            icon: icons(google)['router'],
+            map: map,
+            label: {
+                text: markerText[i],
+                color: "#000000",
+                fontWeight: "bold",
+                fontSize: "16px",
+                className: "map-label"
+            },
+        }));
+    }
+    return markers
+}
+
+
+function animateMapZoomTo(map, targetZoom) {
+    var currentZoom = arguments[2] || map.getZoom();
+    if (currentZoom != targetZoom) {
+        google.maps.event.addListenerOnce(map, 'zoom_changed', function (event) {
+            animateMapZoomTo(map, targetZoom, currentZoom + (targetZoom > currentZoom ? 1 : -1));
+        });
+        setTimeout(function(){ map.setZoom(currentZoom) }, 300);
+    }
 }
