@@ -41,3 +41,12 @@ def maps(request, mno):
     }
     response = render(request, 'map_01.html', context)
     return response
+
+
+def test(request):
+    m_key = 'AIzaSyBSCfYSvhqS17N9skfLIzThSVNea5mvEBs'
+    context = {
+        'm_keys': m_key,
+    }
+    response = render(request, 'test.html', context)
+    return response

@@ -57,13 +57,35 @@
                             </div>
                         </div>
                     </div>
+                    <div class=" col-md-12 col-xl-12 card grid-margin stretch-card">
+                        <div class="card-body">
+                            <div class="d-flex flex-row justify-content-between">
+                                <h4 class="card-title">위협 로그</h4>
+                            </div>
+                            <div class="preview-list">
+                                <table class="table" id="tb_threat_log">
+                                    <tr>
+                                        <td class="text-danger" style="width:50%;">서울 ----------------> 중국</td>
+                                        <td><span class="text-summary font-weight-bold">네트워크 이동</span></td>
+                                    </tr>
+                                </table>
+{#                                <div id="logArea" class="row">#}
+{#                                    <div class="col-md-8 col-xl-8 ">#}
+{#                                        <span class="text-danger text-left">서울 ------------------------>중국</span>#}
+{#                                    </div>#}
+{#                                    <div class="col-md-4 col-xl-4">#}
+{#                                        <span class="text-secondary font-weight-bold">네트워크 이동</span>#}
+{#                                    </div>#}
+{#                                </div>#}
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <div class="col-md-6 col-xl-6 grid-margin stretch-card">
                     <div class="card">
                         <div class="card-body">
                             <h4 class="card-title">Maps</h4>
                             {# Map Sector #}
-                            <script src="https://maps.googleapis.com/maps/api/js?key={{ m_keys }}&callback=initMap&v=weekly" defer></script>
                             <div id="map" class="col-md-12 col-xl-12" style="height:90%;"></div>
                         </div>
                     </div>
@@ -147,7 +169,6 @@
     <!-- container-scroller -->
     <script src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
     <script>
-
         var nodes = null;
         var edges = null;
         var network = null;
@@ -266,62 +287,119 @@
             network = new vis.Network(container, data, options);
         }
         draw();
+    </script>
 
+
+    <script>
+        const GoogleMapsOverlay = deck.GoogleMapsOverlay;
+        const TripsLayer = deck.TripsLayer;
+        const DATA_URL = "{% static 'test.json' %}";
+        const JSONS = $.getJSON(DATA_URL)
+        {#const LOOP_LENGTH =#}
+        let map = null;
+        let markers = null
+        const VENDOR_COLORS = [
+            [255, 0, 0],
+            [0, 0, 255], // vendor #1
+        ];
+        hide = null;
+        show = null;
         // Initialize and add the map
         function initMap() {
-            // The location of Uluru
-            // 37.63124, 127.2899 (seoul), 34.26658239342853, 27.4673394037323, 112.0221605275621(후난성), 23.639397214043683, 81.15063376483022(인도 어딘가), 39.058678662262984, 125.76824421680736(김일성종합대학)
+            // 37.63124, 127.2899 (seoul), 27.4673394037323, 112.0221605275621(후난성), 23.639397214043683, 81.15063376483022(인도 어딘가), 39.058678662262984, 125.76824421680736(김일성종합대학)
             const target = [{ lat: 37.63124, lng: 127.2899 }, { lat: 27.4673394037323, lng: 112.0221605275621 }, { lat: 23.639397214043683, lng: 81.15063376483022 }, { lat: 39.058678662262984, lng: 125.76824421680736 }];
-            // The map, centered at Uluru
-            const map = new google.maps.Map(document.getElementById("map"), {
+            loop_length = JSONS.responseJSON[0].timestamps[JSONS.responseJSON[0].timestamps.length-1]+100
+            map = new google.maps.Map(document.getElementById("map"), {
                 zoom: 4,
                 center: target[0],
                 styles: map_styles,
             });
-            {# 아이콘 정의 #}
-            const icons =  {
-                nuclear: {
-                    url: "{% static "img/icons/nuclear.png" %}",
-                    size: new google.maps.Size(90, 90),
-                    origin: new google.maps.Point(0, 0),
-                    anchor: new google.maps.Point(17, 34),
-                    scaledSize: new google.maps.Size(30, 30),
-                },
-                n_school: {
-                    url: "{% static "img/icons/nuclear_negative.png" %}",
-                    size: new google.maps.Size(90, 90),
-                    origin: new google.maps.Point(0, 0),
-                    anchor: new google.maps.Point(17, 34),
-                    scaledSize: new google.maps.Size(40, 40),
-                },
-                school: {
-                    url: "{% static "img/icons/school_negative.png" %}",
-                    size: new google.maps.Size(90, 90),
-                    origin: new google.maps.Point(0, 0),
-                    anchor: new google.maps.Point(17, 34),
-                    scaledSize: new google.maps.Size(40, 40),
-                },
-                pc: {
-                    url: "{% static "img/icons/PC.png" %}",
-                    size: new google.maps.Size(71, 71),
-                    origin: new google.maps.Point(0, 0),
-                    anchor: new google.maps.Point(17, 34),
-                    scaledSize: new google.maps.Size(25, 25)
-                },
-                server: {
-                    url: "{% static "img/icons/server.png" %}",
-                    size: new google.maps.Size(100, 120),
-                    origin: new google.maps.Point(0, 0),
-                    anchor: new google.maps.Point(17, 34),
-                    scaledSize: new google.maps.Size(40, 40)
-                },
-                router: {
-                    url: "{% static "img/icons/router.png" %}",
-                    size: new google.maps.Size(71, 71),
-                    origin: new google.maps.Point(0, 0),
-                    anchor: new google.maps.Point(15, 30),
-                    scaledSize: new google.maps.Size(25, 25)
+            {# animate map #}
+            let currentTime = 0;
+            const props = {
+                id: "trips",
+                data: DATA_URL,
+                getPath: (d) => d.path,
+                getTimestamps: (d) => d.timestamps,
+                getColor: (d) => VENDOR_COLORS[d.vendor],
+                opacity: 1,
+                widthMinPixels: 5,
+                trailLength: 180,
+                currentTime,
+                shadowEnabled: false,
+            };
+            const overlay = new GoogleMapsOverlay({});
+            let i = 0;
+            $('#tb_threat_log').text('')
+            const animate = () => {
+                currentTime = (currentTime + 1) % loop_length;
+
+                const tripsLayer = new TripsLayer({
+                    ...props,
+                    currentTime,
+                });
+                overlay.setProps({
+                    layers: [tripsLayer],
+                });
+                if(currentTime == JSONS.responseJSON[0].timestamps[i]) {
+                    show(i)
+                    if(i > 0 && i < JSONS.responseJSON[0].timestamps.length) {
+                        threat_type = "네트워크 경유"
+                        if(i == JSONS.responseJSON[0].timestamps.length-1) threat_type = "위협발생"
+console.log(JSONS.responseJSON[0])
+                        $('#tb_threat_log').append(AddLog(JSONS.responseJSON[0].location[i-1], JSONS.responseJSON[0].location[i], threat_type))
+                    }
+                    if(i > 1) markers[i-2].setMap(null);
+                    markers[i++].setAnimation(google.maps.Animation.BOUNCE)
+
+                } else if(currentTime == loop_length-1) {
+                    for (let i = 0; i < markers.length; i++) {
+                        markers[i].setMap(null);
+                    }
+                     $('#tb_threat_log').html('');
+                    i = 0;
                 }
+                window.requestAnimationFrame(animate);
+            }
+            markers = [
+                new google.maps.Marker({
+                    position: target[0],
+                    icon: icons(google)['pc'],
+                    map: map,
+                    label: {
+                        text: "Hello World",
+                        color: "#FFFFFF",
+                        fontWeight: "bold",
+                        fontSize: "16px",
+                        className: "map-label"
+                    },
+                }),
+                new google.maps.Marker({
+                    position: target[1],
+                    icon: icons(google)['router'],
+                    map: map,
+                }),
+                new google.maps.Marker({
+                    position: target[2],
+                    icon: icons(google)['pc'],
+                    map: map,
+                }),
+                new google.maps.Marker({
+                    position: target[3],
+                    icon: icons(google)['ㅁ'],
+                    map: map,
+                }),
+            ];
+
+            hide = function (index) {
+                markers[index].setMap(null);
+            }
+            for (let i = 0; i < markers.length; i++) {
+                markers[i].setMap(null);
+            }
+
+            show = function (index) {
+                markers[index].setMap(map);
             }
             {# 마커 클릭시 텍스트 정의 #}
             const contentString = "<span class='text-black'>test one 2 three</span>";
@@ -330,52 +408,23 @@
                 maxWidth: 200,
             });
             {# 마커 위치 #}
-            const markers = [
-                {#new google.maps.Marker({#}
-                {#    position: target[0],#}
-                {#    icon: icons['pc'],#}
-                {#    map: map,#}
-                {#}),#}
-            {#new google.maps.Marker({#}
-            {#    position: target[1],#}
-            {#    icon: icons['router'],#}
-            {#    map: map,#}
-            {#}),#}
-                {#new google.maps.Marker({#}
-                {#    position: target[2],#}
-                {#    icon: icons['pc'],#}
-                {#    map: map,#}
-                {#}),#}
-                    new google.maps.Marker({
-                        position: target[3],
-                        icon: icons['ㅁ'],
-                        map: map,
-                    })
-                ]
 
-                    {# 클릭이벤트 추가 #}
-                    {#for (i=0;i<4;i++) {#}
-                    {#    markers[i].addListener("click", () => {#}
-                    {#        infowindow.open({#}
-                    {#            anchor: markers[i],#}
-                    {#            map,#}
-                    {#            shouldFocus: false,#}
-                    {#        });#}
-                    {#    });#}
-                    {#}#}
-                        {# 연결정보 선그리기 #}
 
-                        const flightPath = new google.maps.Polyline({
-                            path: target,
-                            geodesic: true,
-                            strokeColor: "#FF0000",
-                            strokeOpacity: 1.0,
-                            strokeWeight: 2,
-                        });
+            {# 클릭이벤트 추가 #}
+            {#for (i=0;i<4;i++) {#}
+            {#    markers[i].addListener("click", () => {#}
+            {#        infowindow.open({#}
+            {#            anchor: markers[i],#}
+            {#            map,#}
+            {#            shouldFocus: false,#}
+            {#        });#}
+            {#    });#}
+            //}
 
-                        flightPath.setMap(map);
-                    }
-                    window.initMap = initMap;
+            window.requestAnimationFrame(animate);
+            overlay.setMap(map);
+        }
+        window.initMap = initMap;
 
 
 
