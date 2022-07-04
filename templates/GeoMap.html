@@ -167,130 +167,23 @@
     <!-- page-body-wrapper ends -->
     </div>
     <!-- container-scroller -->
+    {#//test = '[{"vendor": 0, "path": [   [127.2899, 37.63124],   [ 112.0221605275621,  27.4673394037323],   [81.15063376483022, 23.639397214043683], [125.76824421680736, 39.058678662262984]],    "timestamps": [ 1, 100, 200, 300],    "location": ["서울", "중국", "인도", "북한"]  }]'#}
+    {#  <script type="text/javascript" src="{% static 'test.json'%}"></script>#}
     <script src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
     <script>
         var nodes = null;
         var edges = null;
         var network = null;
-
+        let overlays;
         var DIR = "{% static 'img/refresh-cl/'%}";
         var EDGE_LENGTH_MAIN = 150;
         var EDGE_LENGTH_SUB = 50;
         x = 0
         y = 0
         // Called when the Visualization API is loaded.
-        function draw() {
-            // Create a data table with nodes.
-            nodes = [];
 
-            // Create a data table with links.
-            edges = [];
+        draw(DIR);
 
-            nodes.push({
-                id: 1,
-                label: "교장실",
-                x: x+=100,
-                y: y+=50,
-                image: DIR + "router.png",
-                shape: "image",
-            });
-            nodes.push({
-                id: 2,
-                label: "Switch",
-                x: x+=100,
-                y: y+=50,
-                image: DIR + "switch.png",
-                shape: "image",
-            });
-            edges.push({ from: 1, to: 2, length: EDGE_LENGTH_MAIN });
-            arr = ["169.0.1.16","169.0.1.17","169.0.1.18","169.0.1.19"]
-            for (var i = 3; i <= 6; i++) {
-                nodes.push({
-                    id: i,
-                    label: arr[i-3],
-                    x: x+=100,
-                    y: y+=50,
-                    image: DIR + "pc.png",
-                    shape: "image",
-                });
-                edges.push({ from: 2, to: i, length: EDGE_LENGTH_SUB });
-            }
-
-            nodes.push({
-                id: 101,
-                label: "Printer",
-                image: DIR + "Hardware-Printer-Blue-icon.png",
-                x: x+=100,
-                y: y+=50,
-                shape: "image",
-            });
-            edges.push({ from: 2, to: 101, length: EDGE_LENGTH_SUB });
-
-            nodes.push({
-                id: 11,
-                label: "제1교무실",
-                x: x+=100,
-                y: y+=50,
-                image: DIR + "router.png",
-                shape: "image",
-            });
-            nodes.push({
-                id: 12,
-                label: "Switch",
-                x: x+=100,
-                y: y+=50,
-                image: DIR + "switch.png",
-                shape: "image",
-            });
-            edges.push({ from: 11, to: 12, length: EDGE_LENGTH_MAIN });
-            arr = ["169.14.21.16","169.14.21.17","169.14.21.18","169.14.21.19"]
-            for (var i = 13; i <= 16; i++) {
-                nodes.push({
-                    id: i,
-                    label: arr[i-13],
-                    x: x+=100,
-                    y: y+=50,
-                    image: DIR + "pc.png",
-                    shape: "image",
-                });
-                edges.push({ from: 12, to: i, length: EDGE_LENGTH_SUB });
-            }
-
-            nodes.push({
-                id: 1101,
-                label: "Printer",
-                image: DIR + "Hardware-Printer-Blue-icon.png",
-                x: x+=100,
-                y: y+=50,
-                shape: "image",
-            });
-            edges.push({ from: 12, to: 1101, length: EDGE_LENGTH_SUB });
-
-            nodes.push({
-                id: 104,
-                label: "39120",
-                x: x+=100,
-                y: y+=50,
-                image: DIR + "System-Firewall-2-icon.png",
-                shape: "image",
-            });
-            edges.push({ from: 1, to: 104, length: EDGE_LENGTH_SUB });
-            edges.push({ from: 11, to: 104, length: EDGE_LENGTH_SUB });
-
-            // create a network
-            var container = document.getElementById("mynetwork");
-            var data = {
-                nodes: nodes,
-                edges: edges,
-            };
-            var options = {};
-            network = new vis.Network(container, data, options);
-        }
-        draw();
-    </script>
-
-
-    <script>
         const GoogleMapsOverlay = deck.GoogleMapsOverlay;
         const TripsLayer = deck.TripsLayer;
         const DATA_URL = "{% static 'test.json' %}";
@@ -307,142 +200,31 @@
         hide = null;
         show = null;
         flag = false;
-        // Initialize and add the map
+        const target = [{ lat: 37.63124, lng: 127.2899 }, { lat: 27.4673394037323, lng: 112.0221605275621 }, { lat: 23.639397214043683, lng: 81.15063376483022 }, { lat: 39.058678662262984, lng: 125.76824421680736 }];
         function initMap(listener) {
             // 37.63124, 127.2899 (seoul), 27.4673394037323, 112.0221605275621(후난성), 23.639397214043683, 81.15063376483022(인도 어딘가), 39.058678662262984, 125.76824421680736(김일성종합대학)
-            const target = [{ lat: 37.63124, lng: 127.2899 }, { lat: 27.4673394037323, lng: 112.0221605275621 }, { lat: 23.639397214043683, lng: 81.15063376483022 }, { lat: 39.058678662262984, lng: 125.76824421680736 }];
-            loop_length = JSONS.responseJSON[0].timestamps[JSONS.responseJSON[0].timestamps.length-1]+100
             map = new google.maps.Map(document.getElementById("map"), {
                 zoom: 4,
                 center: target[0],
                 {#styles: map_styles,#}
             });
-            {# animate map #}
-            let currentTime = 0;
-            const props = {
-                id: "trips",
-                data: DATA_URL,
-                getPath: (d) => d.path,
-                getTimestamps: (d) => d.timestamps,
-                getColor: (d) => VENDOR_COLORS[d.vendor],
-                opacity: 1,
-                widthMinPixels: 5,
-                trailLength: 180,
-                currentTime,
-                shadowEnabled: false,
-            };
-            const overlay = new GoogleMapsOverlay({});
-            const animate = () => {
-                currentTime = (currentTime + 1) % loop_length;
-
-                const tripsLayer = new TripsLayer({
-                    ...props,
-                    currentTime,
-                });
-                if(map.getZoom() < 10) {
-                    overlay.setProps({
-                        layers: [tripsLayer],
-                    });
-                    if (currentTime == JSONS.responseJSON[0].timestamps[j]) {
-                        show(j)
-                        if (j > 0 && j < JSONS.responseJSON[0].timestamps.length) {
-                            threat_type = "네트워크 경유"
-                            if (j == JSONS.responseJSON[0].timestamps.length - 1) threat_type = "위협발생"
-                            $('#tb_threat_log').append(AddLog(JSONS.responseJSON[0].location[j - 1], JSONS.responseJSON[0].location[j], threat_type))
-                        }
-                        if (j > 1) markers[j - 2].setMap(null);
-                        markers[j++].setAnimation(google.maps.Animation.BOUNCE)
-
-                    } else if (currentTime == loop_length - 1) {
-                        for (let i = 0; i < markers.length; i++) {
-                            markers[i].setMap(null);
-                        }
-                        $('#tb_threat_log').html('');
-                        j = 0;
-                    }
-                }
-                window.requestAnimationFrame(animate);
-            }
-
-            let j = 0;
-            $('#tb_threat_log').text('')
-
-            {# new create markers #}
-            if(map.getZoom() < 10)  markers = newMarkers(JSONS.responseJSON[0].location.length, JSONS.responseJSON[0].location, target)
-
-            hide = function (index) {
-                markers[index].setMap(null);
-            }
-            hideAll = function (mark) {
-                for (let i = 0; i < mark.length; i++) {
-                    mark[i].setMap(null);
-                }
-            }
-            show = function (index) {
-                markers[index].setMap(map);
-            }
-            hideAll(markers)
 
 
-            {# 마커 클릭시 텍스트 정의 #}
-            const contentString = "<span class='text-black'>test one 2 three</span>";
-            const infowindow = new google.maps.InfoWindow({
-                content: contentString,
-                maxWidth: 200,
-            });
-
-            {# marker zoom up event #}
-            markers[markers.length-1].addListener("click", (e) => {
-                map.setCenter(markers[markers.length-1].getPosition());
-                animateMapZoomTo(map, 18)
-                map.setZoom(18)
-                hideAll(markers)
-            });
-
-            {# marker zoom up event #}
-            map.addListener("zoom_changed", (e) => {
-                if(map.zoom > 14) {
-                    markers2 = newMarkers(5, ["종합대학","혁명사적관","학생빌딩","과학도서관",".."], [target[3],
-                        {lat:39.05807855450129, lng:125.76711363450084},
-                        {lat:39.05934347236878, lng:125.77019746627538},
-                        {lat:39.05628854814572, lng:125.7673594819969},
-                        {lat:39.05695679415487, lng:125.77108898847766}]);
-                    console.log(markers2, "22")
-                    for (i=0;i<markers2.length;i++) {
-                        markers2[i].setMap(map)
-                    }
-                } else if (map.zoom < 10) {
-                    hideAll(markers2)
-                    markers = newMarkers(JSONS.responseJSON[0].location.length, JSONS.responseJSON[0].location, target)
-                }else {
-                    hideAll(markers)
-                    hideAll(markers2)
-                }
-            });
-            a = overlay;
-            {# 클릭이벤트 추가 #}
-            {#for (i=0;i<4;i++) {#}
-            {#    markers[i].addListener("click", () => {#}
-            {#        infowindow.open({#}
-            {#            anchor: markers[i],#}
-            {#            map,#}
-            {#            shouldFocus: false,#}
-            {#        });#}
-            {#    });#}
-            //}
-
-            window.requestAnimationFrame(animate);
+        }
+        window.initMap = initMap;
+        function ThreatAnimationLayer(){
+            overlay = test2(JSONS.responseJSON)
 
             overlay.setMap(map);
         }
-        window.initMap = initMap;
+        setTimeout(function(){
+            ThreatAnimationLayer()
+        },500)
 
-
-
-        test = setInterval(function(){
+        aa = setInterval(function(){
             if($('#detailNetworks').hasClass('show')) network.moveTo({ position: {x:0, y:0}, scale:0.8})
             if(network.getViewPosition().x == 0 && network.getViewPosition().y == 0)
-                clearInterval(test);
+                clearInterval(aa);
         },500);
 
     </script>
