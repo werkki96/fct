@@ -290,11 +290,10 @@ function draw(dir) {
 
 
 
-let test24;
-let test22 = 0;
-function test2(json) {
+let aniHandler;
+function AnimationOverlayView(json) {
     // {# animate map #}
-            loop_length = json[0].timestamps[json[0].timestamps.length-1]+100
+    loop_length = json[0].timestamps[json[0].timestamps.length-1]+100
     //console.log(loop_length)
     let currentTime = 0;
     const props = {
@@ -312,7 +311,6 @@ function test2(json) {
     const overlay = new GoogleMapsOverlay({});
     const animate = () => {
         currentTime = (currentTime + 1) % loop_length;
-        test22++;
         const tripsLayer = new TripsLayer({
             ...props,
             currentTime,
@@ -339,9 +337,9 @@ function test2(json) {
                 j = 0;
             }
         }
-        if(!flag) test24 = window.requestAnimationFrame(animate);
+        if(!flag) aniHandler = window.requestAnimationFrame(animate);
         else {
-            window.cancelAnimationFrame(test24)
+            window.cancelAnimationFrame(aniHandler)
             overlay.setMap(null)
             hideAll(markers)
         }
@@ -380,27 +378,40 @@ function test2(json) {
         animateMapZoomTo(map, 18)
         map.setZoom(18)
         hideAll(markers)
+        flag = true
     });
 
     // {# marker zoom up event #}
     map.addListener("zoom_changed", (e) => {
+        //줌했을때 물리노드 보이는 좌표
+        zoomTarget = [target[3],
+            {lat:39.05807855450129, lng:125.76711363450084},
+            {lat:39.05934347236878, lng:125.77019746627538},
+            {lat:39.05628854814572, lng:125.7673594819969},
+            {lat:39.05695679415487, lng:125.77108898847766}]
+        zoomTarget = zoomTarget.concat([zoomTarget[0], zoomTarget[2], zoomTarget[4], zoomTarget[1], zoomTarget[3], zoomTarget[0]])
         if(map.zoom > 14) {
-            markers2 = newMarkers(5, ["종합대학","혁명사적관","학생빌딩","과학도서관",".."], [target[3],
-                {lat:39.05807855450129, lng:125.76711363450084},
-                {lat:39.05934347236878, lng:125.77019746627538},
-                {lat:39.05628854814572, lng:125.7673594819969},
-                {lat:39.05695679415487, lng:125.77108898847766}]);
-            console.log(markers2, "22")
+            markers2 = newMarkers(5, ["종합대학","혁명사적관","학생빌딩","과학도서관",".."], zoomTarget);
             for (let i=0;i<markers2.length;i++) {
                 markers2[i].setMap(map)
             }
         } else if (map.zoom < 10) {
             hideAll(markers2)
             markers = newMarkers(json[0].location.length, json[0].location, target)
+            flag = false;
         }else {
             hideAll(markers)
             hideAll(markers2)
         }
+        const flightPath = new google.maps.Polyline({
+            path: zoomTarget,
+            geodesic: true,
+            strokeColor: "#FF0000",
+            strokeOpacity: 1.0,
+            strokeWeight: 2,
+        });
+
+        flightPath.setMap(map);
     });
 
 

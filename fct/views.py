@@ -50,3 +50,11 @@ def test(request):
     }
     response = render(request, 'test.html', context)
     return response
+
+def base(request):
+    m_key = 'AIzaSyBSCfYSvhqS17N9skfLIzThSVNea5mvEBs'
+    context = {
+        'm_keys': m_key,
+    }
+    response = render(request, 'base.html', context)
+    return response
