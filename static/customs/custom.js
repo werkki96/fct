@@ -291,6 +291,7 @@ function draw(dir) {
 
 
 let aniHandler;
+let aa ;
 function AnimationOverlayView(json) {
     // {# animate map #}
     loop_length = json[0].timestamps[json[0].timestamps.length-1]+100
@@ -304,21 +305,30 @@ function AnimationOverlayView(json) {
         getColor: (d) => VENDOR_COLORS[d.vendor],
         opacity: 1,
         widthMinPixels: 5,
-        trailLength: 180,
+        trailLength: 80,
         currentTime,
         shadowEnabled: false,
+        rounded:true,
     };
+    aa = props
+    show = function(index) {
+        markers[index].setMap(map);
+    }
+
     const overlay = new GoogleMapsOverlay({});
+
     const animate = () => {
-        currentTime = (currentTime + 1) % loop_length;
-        const tripsLayer = new TripsLayer({
+        //console.log(props)
+        let tripsLayer = new TripsLayer({
             ...props,
             currentTime,
         });
+        overlay.setProps({
+            layers: [tripsLayer],
+        });
+        currentTime = (currentTime + 1) % loop_length;
+
         if(map.getZoom() < 10) {
-            overlay.setProps({
-                layers: [tripsLayer],
-            });
             if (currentTime == json[0].timestamps[j]) {
                 show(j)
                 if (j > 0 && j < json[0].timestamps.length) {
@@ -337,10 +347,13 @@ function AnimationOverlayView(json) {
                 j = 0;
             }
         }
-        if(!flag) aniHandler = window.requestAnimationFrame(animate);
+        if(!flag) {
+            aniHandler = window.requestAnimationFrame(animate);
+            props.opacity = 1;
+        }
         else {
             window.cancelAnimationFrame(aniHandler)
-            overlay.setMap(null)
+            props.opacity = 0;
             hideAll(markers)
         }
     }
@@ -351,13 +364,7 @@ function AnimationOverlayView(json) {
     // {# new create markers #}
     if(map.getZoom() < 10)  markers = newMarkers(json[0].location.length, json[0].location, target)
 
-    hide = function (index) {
-        markers[index].setMap(null);
-    }
 
-    show = function (index) {
-        markers[index].setMap(map);
-    }
     hideAll(markers)
 
 
@@ -399,16 +406,19 @@ function AnimationOverlayView(json) {
             if(markers2 == ''){
                 markers2 = newMarkers(5, ["종합대학","혁명사적관","학생빌딩","과학도서관",".."], zoomTarget);
             }
-            for (let i=0;i<markers2.length;i++) {
-                markers2[i].setMap(map)
-            }
+            markerShowAll(markers2, map)
+
             flightPath.setVisible(true);
             flightPath.setMap(map);
             flag = true;
         } else if (map.zoom < 10) {
             hideAll(markers2)
+            //markerShowAll(markers, map)
+            if(flag == true) {
+               aniHandler = window.requestAnimationFrame(animate);
 
-            markers = newMarkers(json[0].location.length, json[0].location, target)
+            }
+            //markers = newMarkers(json[0].location.length, json[0].location, target)
             flag = false;
         }else {
             hideAll(markers)
@@ -426,5 +436,10 @@ function AnimationOverlayView(json) {
 function hideAll(mark) {
     for (let i = 0; i < mark.length; i++) {
         mark[i].setMap(null);
+    }
+}
+function markerShowAll(mark, map) {
+    for (let i = 0; i < mark.length; i++) {
+        mark[i].setMap(map);
     }
 }
