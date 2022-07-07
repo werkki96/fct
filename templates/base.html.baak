@@ -1,0 +1,99 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>FCT</title>
+    <!-- plugins:css -->
+    <link rel="stylesheet" href="{% static 'vendors/mdi/css/materialdesignicons.min.css' %}">
+    <link rel="stylesheet" href="{% static 'vendors/css/vendor.bundle.base.css'%}">
+    <!-- endinject -->
+    <!-- Plugin css for this page -->
+    <link rel="stylesheet" href="{% static 'vendors/jvectormap/jquery-jvectormap.css'%}">
+    <link rel="stylesheet" href="{% static 'vendors/flag-icon-css/css/flag-icon.min.css'%}">
+    <link rel="stylesheet" href="{% static 'vendors/owl-carousel-2/owl.carousel.min.css'%}">
+    <link rel="stylesheet" href="{% static 'vendors/owl-carousel-2/owl.theme.default.min.css'%}">
+    <!-- End plugin css for this page -->
+    <!-- inject:css -->
+    <!-- endinject -->
+    <!-- Layout styles -->
+    <link rel="stylesheet" href="{% static 'css/style.css'%}">
+    <!-- End layout styles -->
+    <link rel="shortcut icon" href="{% static 'images/logo.png'%}" />
+
+    <script src="{% static 'customs/custom.js'%}"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key={{ m_keys }}&callback=initMap&v=weekly" defer></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
+    <script src="https://unpkg.com/deck.gl@8.7.3/dist.min.js"></script>
+    <script src="https://unpkg.com/@deck.gl/google-maps@8.7.3/dist.min.js"></script>
+</head>
+<body class="sidebar-icon-only">
+<div class="container-scroller">
+    <!-- partial:partials/_sidebar.html -->
+    <!-- partial -->
+    <div class="container-fluid page-body-wrapper">
+        <!-- partial:partials/_navbar.html -->
+        <nav class="navbar p-0 fixed-top d-flex flex-row">
+            <div class="navbar-menu-wrapper flex-grow d-flex align-items-stretch">
+                <ul class="nav navbar-nav mx-auto">
+                    <li class="nav-item btn">
+                        <a class="btn btn-outline-light btn-fw {% if request.path == "/" %}active{% endif %}" id="profileDropdown" href="/">
+                            Geo MAP
+                        </a>
+                    </li>
+                    <li class="nav-item btn">
+                        <a class="btn btn-outline-light btn-fw {% if request.path == "/logical_cyber" %}active{% endif %}" id="profileDropdown" href="/logical_cyber">
+                            논리적 사이버 3계층
+                        </a>
+                    </li>
+                    <li class="nav-item btn">
+                        <a class="btn btn-outline-light btn-fw {% if request.path == "/target" %}active{% endif %}" id="profileDropdown" href="/target">
+                            표적 우선순위
+                        </a>
+                    </li>
+                    <li class="nav-item btn">
+                        <a class="btn btn-outline-light btn-fw {% if request.path == "/events" %}active{% endif %}" id="profileDropdown" href="/events">
+                            관심구역 內 이벤트 요소
+                        </a>
+                    </li>
+                    <li class="nav-item btn">
+                        <a class="btn btn-outline-light btn-fw {% if request.path == "/threats" %}active{% endif %}" id="profileDropdown" href="/treats">
+                            위협 대응방책
+                        </a>
+                    </li>
+                </ul>
+                <button class="navbar-toggler navbar-toggler-right d-lg-none align-self-center" type="button" data-toggle="offcanvas">
+                    <span class="mdi mdi-format-line-spacing"></span>
+                </button>
+            </div>
+        </nav>
+        {% block content%}
+
+        {% endblock %}
+
+        <!-- plugins:js -->
+        <script src="{% static 'vendors/js/vendor.bundle.base.js'%}"></script>
+        <!-- endinject -->
+        <!-- Plugin js for this page -->
+        <script src="{% static 'vendors/chart.js/Chart.min.js'%}"></script>
+        <script src="{% static 'vendors/progressbar.js/progressbar.min.js'%}"></script>
+        <script src="{% static 'vendors/jvectormap/jquery-jvectormap.min.js'%}"></script>
+        <script src="{% static 'vendors/jvectormap/jquery-jvectormap-world-mill-en.js'%}"></script>
+        <script src="{% static 'vendors/owl-carousel-2/owl.carousel.min.js'%}"></script>
+        <!-- End plugin js for this page -->
+        <!-- inject:js -->
+        <script src="{% static 'js/off-canvas.js'%}"></script>
+        <script src="{% static 'js/hoverable-collapse.js'%}"></script>
+        <script src="{% static 'js/misc.js'%}"></script>
+        <script src="{% static 'js/settings.js'%}"></script>
+        <script src="{% static 'js/todolist.js'%}"></script>
+        <!-- endinject -->
+        <!-- Custom js for this page -->
+        <script src="{% static 'js/dashboard.js'%}"></script>
+        <!-- End custom js for this page -->
+</body>
+</html>
+</html>
