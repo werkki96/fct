@@ -162,6 +162,7 @@ function newMarkers(length, markerText, positions, map){
                 fontSize: "16px",
                 className: "map-label"
             },
+            id:"test"
         }));
     }
     return markers
@@ -289,7 +290,6 @@ function draw(dir) {
 }
 
 
-
 let aniHandler;
 function AnimationOverlayView(json) {
     // {# animate map #}
@@ -354,11 +354,7 @@ function AnimationOverlayView(json) {
     hide = function (index) {
         markers[index].setMap(null);
     }
-    hideAll = function (mark) {
-        for (let i = 0; i < mark.length; i++) {
-            mark[i].setMap(null);
-        }
-    }
+
     show = function (index) {
         markers[index].setMap(map);
     }
@@ -380,7 +376,7 @@ function AnimationOverlayView(json) {
         hideAll(markers)
         flag = true
     });
-
+    flightPath = null;
     // {# marker zoom up event #}
     map.addListener("zoom_changed", (e) => {
         //줌했을때 물리노드 보이는 좌표
@@ -390,32 +386,45 @@ function AnimationOverlayView(json) {
             {lat:39.05628854814572, lng:125.7673594819969},
             {lat:39.05695679415487, lng:125.77108898847766}]
         zoomTarget = zoomTarget.concat([zoomTarget[0], zoomTarget[2], zoomTarget[4], zoomTarget[1], zoomTarget[3], zoomTarget[0]])
+        if(flightPath == null) {
+            flightPath = new google.maps.Polyline({
+                path: zoomTarget,
+                geodesic: true,
+                strokeColor: "#FF0000",
+                strokeOpacity: 1.0,
+                strokeWeight: 2,
+            });
+        }
         if(map.zoom > 14) {
-            markers2 = newMarkers(5, ["종합대학","혁명사적관","학생빌딩","과학도서관",".."], zoomTarget);
+            if(markers2 == ''){
+                markers2 = newMarkers(5, ["종합대학","혁명사적관","학생빌딩","과학도서관",".."], zoomTarget);
+            }
             for (let i=0;i<markers2.length;i++) {
                 markers2[i].setMap(map)
             }
+            flightPath.setVisible(true);
+            flightPath.setMap(map);
+            flag = true;
         } else if (map.zoom < 10) {
             hideAll(markers2)
+
             markers = newMarkers(json[0].location.length, json[0].location, target)
             flag = false;
         }else {
             hideAll(markers)
             hideAll(markers2)
+            flightPath.setVisible(false)
         }
-        const flightPath = new google.maps.Polyline({
-            path: zoomTarget,
-            geodesic: true,
-            strokeColor: "#FF0000",
-            strokeOpacity: 1.0,
-            strokeWeight: 2,
-        });
-
-        flightPath.setMap(map);
     });
 
 
     window.requestAnimationFrame(animate);
 
     return overlay;
+}
+
+function hideAll(mark) {
+    for (let i = 0; i < mark.length; i++) {
+        mark[i].setMap(null);
+    }
 }
