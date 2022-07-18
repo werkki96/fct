@@ -313,6 +313,21 @@ function AnimationOverlayView(json) {
     aa = props
     show = function(index) {
         markers[index].setMap(map);
+        markers_2[index].setMap(map);
+        markers_3[index].setMap(map);
+        markers_4[index].setMap(map);
+        markers_5[index].setMap(map);
+        markers_6[index].setMap(map);
+        markers_7[index].setMap(map);
+        markers_8[index].setMap(map);
+        markers_9[index].setMap(map);
+        markers_10[index].setMap(map);
+        markers_11[index].setMap(map);
+        markers_12[index].setMap(map);
+        markers_13[index].setMap(map);
+        markers_14[index].setMap(map);
+        markers_15[index].setMap(map);
+        markers_16[index].setMap(map);
     }
 
     const overlay = new GoogleMapsOverlay({});
@@ -336,12 +351,60 @@ function AnimationOverlayView(json) {
                     if (j == json[0].timestamps.length - 1) threat_type = "위협발생"
                     $('#tb_threat_log').append(AddLog(json[0].location[j - 1], json[0].location[j], threat_type))
                 }
-                if (j > 1) markers[j - 2].setMap(null);
+                if (j > 1){
+                    markers[j - 2].setMap(null);
+                    markers_2[j - 2].setMap(null);
+                    markers_3[j - 2].setMap(null);
+                    markers_4[j - 2].setMap(null);
+                    markers_5[j - 2].setMap(null);
+                    markers_6[j - 2].setMap(null);
+                    markers_7[j - 2].setMap(null);
+                    markers_8[j - 2].setMap(null);
+                    markers_9[j - 2].setMap(null);
+                    markers_10[j - 2].setMap(null);
+                    markers_11[j - 2].setMap(null);
+                    markers_12[j - 2].setMap(null);
+                    markers_13[j - 2].setMap(null);
+                    markers_14[j - 2].setMap(null);
+                    markers_15[j - 2].setMap(null);
+                    markers_16[j - 2].setMap(null);
+                }
+                markers_2[j].setAnimation(google.maps.Animation.BOUNCE)
+                markers_3[j].setAnimation(google.maps.Animation.BOUNCE)
+                markers_4[j].setAnimation(google.maps.Animation.BOUNCE)
+                markers_5[j].setAnimation(google.maps.Animation.BOUNCE)
+                markers_6[j].setAnimation(google.maps.Animation.BOUNCE)
+                markers_7[j].setAnimation(google.maps.Animation.BOUNCE)
+                markers_8[j].setAnimation(google.maps.Animation.BOUNCE)
+                markers_9[j].setAnimation(google.maps.Animation.BOUNCE)
+                markers_10[j].setAnimation(google.maps.Animation.BOUNCE)
+                markers_11[j].setAnimation(google.maps.Animation.BOUNCE)
+                markers_12[j].setAnimation(google.maps.Animation.BOUNCE)
+                markers_13[j].setAnimation(google.maps.Animation.BOUNCE)
+                markers_14[j].setAnimation(google.maps.Animation.BOUNCE)
+                markers_15[j].setAnimation(google.maps.Animation.BOUNCE)
+                markers_16[j].setAnimation(google.maps.Animation.BOUNCE)
                 markers[j++].setAnimation(google.maps.Animation.BOUNCE)
+
 
             } else if (currentTime == loop_length - 1) {
                 for (let i = 0; i < markers.length; i++) {
                     markers[i].setMap(null);
+                    markers_2[i].setMap(null);
+                    markers_3[i].setMap(null);
+                    markers_4[i].setMap(null);
+                    markers_5[i].setMap(null);
+                    markers_6[i].setMap(null);
+                    markers_7[i].setMap(null);
+                    markers_8[i].setMap(null);
+                    markers_9[i].setMap(null);
+                    markers_10[i].setMap(null);
+                    markers_11[i].setMap(null);
+                    markers_12[i].setMap(null);
+                    markers_13[i].setMap(null);
+                    markers_14[i].setMap(null);
+                    markers_15[i].setMap(null);
+                    markers_16[i].setMap(null);
                 }
                 $('#tb_threat_log').html('');
                 j = 0;
@@ -360,12 +423,84 @@ function AnimationOverlayView(json) {
 
     let j = 0;
     $('#tb_threat_log').text('')
-
+    //lat 오른쪽 왼쪽, lng 위아래
+    // 북한 { lat: 39.058678662262984, lng: 125.76824421680736 }
+    // 영국 { lat: 51.4510898289427, lng: -1.7277438152626 }
+    // 러시아 { lat: 55.76633, lng:37.63332 }
+    // 중국 { lat: 39.91040, lng: 116.40784 }
+    // 홍콩 { lat: 22.29579, lng: 114.13927 }
+    // 미국 { lat: 38.90535, lng: -77.03427 }
+    // 스위스 { lat: 46.97053, lng: 7.44797 }
+    // 싱가포르 { lat: 0.38322614183837, lng: 103.884164188281 }
+    // 일본 { lat: 34.3710341583988, lng: 136.907403270728 }
+    // 캐나다 [{ lat: 45.55459, lng: -75.72917 }
+    // 브라질 { lat: -11.04565062461054, lng: -39.9190236603046 }
+    // 스웨덴 { lat : 59.32393, lng : 18.06198 }
+    // 남아공 { lat: -29.21951, lng: 26.08857 }
+    // 불가리아 { lat : 41.4265131266211, lng: 24.9206256368066 },
+    // 캄보디아 { lat : 11.54629, lng : 104.93112 }
+    // 필리핀 { lat: 14.60311, lng: 120.98620 }
+    // 대한민국 lat : 37.63124, lng : 127.2899  }
+    // 이집트 { lat: 30.11246, lng: 31.20469 }
+    // 이탈리아 { lat : 41.92704, lng : 12.44452 }
+    // 호주 { lat : -35.30468, lng : 149.11818 }
+    // 뉴질랜드 { lat : -41.29896, lng : 174.78678 }
+    // 브라질 { lat : -15.68335, lng : -47.80003 }
+    // 페루 { lat : -12.00122, lng : -77.00774 }
+    // 콜롬비아  { lat :4.74056, lng : -74.04241 }
+    // 노르웨이 { lat :59.98176, lng : 10.58528 }
     // {# new create markers #}
-    if(map.getZoom() < 10)  markers = newMarkers(json[0].location.length, json[0].location, target)
+    if(map.getZoom() < 10) {
+        markers = newMarkers(json[0].location.length, json[0].location, target)
+        markers_2 = newMarkers(json[1].location.length, json[1].location, target_2)
+        markers_3 = newMarkers(json[2].location.length, json[2].location, target_3)
+        markers_4 = newMarkers(json[3].location.length, json[3].location, target_4)
+        markers_5 = newMarkers(json[4].location.length, json[4].location, target_5)
+        markers_6 = newMarkers(json[5].location.length, json[5].location, target_6)
+        markers_7 = newMarkers(json[6].location.length, json[6].location, target_7)
+        markers_8 = newMarkers(json[7].location.length, json[7].location, target_8)
+        markers_9 = newMarkers(json[8].location.length, json[8].location, target_9)
+        markers_10 = newMarkers(json[9].location.length, json[9].location, target_10)
+        markers_11 = newMarkers(json[10].location.length, json[10].location, target_11)
+        markers_12 = newMarkers(json[11].location.length, json[11].location, target_12)
+        markers_13 = newMarkers(json[12].location.length, json[12].location, target_13)
+        markers_14 = newMarkers(json[13].location.length, json[13].location, target_14)
+        markers_15 = newMarkers(json[14].location.length, json[14].location, target_15)
+        markers_16 = newMarkers(json[15].location.length, json[15].location, target_16)
+
+    }markerShowAll(markers_2, map)
+    markerShowAll(markers_3, map)
+    markerShowAll(markers_4, map)
+    markerShowAll(markers_5, map)
+    markerShowAll(markers_6, map)
+    markerShowAll(markers_7, map)
+    markerShowAll(markers_8, map)
+    markerShowAll(markers_9, map)
+    markerShowAll(markers_10, map)
+    markerShowAll(markers_11, map)
+    markerShowAll(markers_12, map)
+    markerShowAll(markers_13, map)
+    markerShowAll(markers_14, map)
+    markerShowAll(markers_15, map)
+    markerShowAll(markers_16, map)
 
 
-    hideAll(markers)
+
+    hideAll(markers_2)
+    hideAll(markers_3)
+    hideAll(markers_4)
+    hideAll(markers_5)
+    hideAll(markers_6)
+    hideAll(markers_7)
+    hideAll(markers_8)
+    hideAll(markers_9)
+    hideAll(markers_10)
+    hideAll(markers_11)
+    hideAll(markers_12)
+    hideAll(markers_13)
+    hideAll(markers_14)
+    hideAll(markers_15)
+    hideAll(markers_16)
 
 
     // {# 마커 클릭시 텍스트 정의 #}
@@ -383,6 +518,39 @@ function AnimationOverlayView(json) {
         hideAll(markers)
         flag = true
     });
+
+    markers_2[markers_2.length-1].addListener("click", (a) => {
+        map.setCenter(markers_2[markers_2.length-1].getPosition());
+        animateMapZoomTo(map, 15)
+        map.setZoom(15)
+        hideAll(markers_2)
+        flag = true
+    });
+
+    markers_3[markers_3.length-1].addListener("click", (b) => {
+    map.setCenter(markers_3[markers_3.length-1].getPosition());
+    animateMapZoomTo(map, 18)
+    map.setZoom(18)
+    hideAll(markers_3)
+    flag = true
+    });
+
+    markers_4[markers_4.length-1].addListener("click", (c) => {
+    map.setCenter(markers_4[markers_4.length-1].getPosition());
+    animateMapZoomTo(map, 18)
+    map.setZoom(18)
+    hideAll(markers_4)
+    flag = true
+    });
+
+    markers_5[markers_5.length-1].addListener("click", (d) => {
+    map.setCenter(markers_5[markers_5.length-1].getPosition());
+    animateMapZoomTo(map, 18)
+    map.setZoom(18)
+    hideAll(markers_5)
+    flag = true
+    });
+
     flightPath = null;
     // {# marker zoom up event #}
     map.addListener("zoom_changed", (e) => {
@@ -405,8 +573,7 @@ function AnimationOverlayView(json) {
         if(map.zoom > 14) {
             if(markers2 == ''){
                 markers2 = newMarkers(5, ["종합대학","혁명사적관","학생빌딩","과학도서관",".."], zoomTarget);
-            }
-            markerShowAll(markers2, map)
+            }markerShowAll(markers2, map)
 
             flightPath.setVisible(true);
             flightPath.setMap(map);
@@ -425,9 +592,172 @@ function AnimationOverlayView(json) {
             hideAll(markers2)
             flightPath.setVisible(false)
         }
+
     });
 
+    map.addListener("zoom_changed", (a) => {
+        //줌했을때 물리노드 보이는 좌표
+        zoomTarget2 = [target_2[3],
+            { lat : 37.92713, lng : 126.63468 },
+            { lat : 37.92945, lng : 126.63647 },
+            { lat : 37.92935, lng : 126.62565 }]
+        zoomTarget = zoomTarget.concat([zoomTarget2[0], zoomTarget2[2], zoomTarget2[1], zoomTarget2[3]])
+        if(flightPath != null) {
+            flightPath = new google.maps.Polyline({
+                path: zoomTarget2,
+                geodesic: true,
+                strokeColor: "#FF0000",
+                strokeOpacity: 1.0,
+                strokeWeight: 2,
+            });
+        }
+        if(map.zoom > 14) {
+            if(markers2 != ''){
+                markers2 = newMarkers(3, ["개성공업지구","개성부천공업(주)","평화변전소",".."], zoomTarget2);
+            }markerShowAll(markers2, map)
 
+            flightPath.setVisible(true);
+            flightPath.setMap(map);
+            flag = true;
+        } else if (map.zoom < 10) {
+            hideAll(markers2)
+            //markerShowAll(markers, map)
+            if(flag == true) {
+               aniHandler = window.requestAnimationFrame(animate);
+
+            }
+            //markers = newMarkers(json[0].location.length, json[0].location, target)
+            flag = false;
+        }else {
+            hideAll(markers_2)
+            hideAll(markers2)
+            flightPath.setVisible(false)
+        }
+
+    });
+
+    map.addListener("zoom_changed", (b) => {
+        //줌했을때 물리노드 보이는 좌표
+        zoomTarget3 = [target_3[3],
+            { lat : 39.77649, lng : 125.75728 },
+            { lat : 39.77567, lng : 125.75433 },
+            { lat : 39.79758, lng : 125.75486 }]
+        zoomTarget = zoomTarget.concat([zoomTarget3[0], zoomTarget3[2], zoomTarget3[1], zoomTarget3[3]])
+        if(flightPath != null) {
+            flightPath = new google.maps.Polyline({
+                path: zoomTarget3,
+                geodesic: true,
+                strokeColor: "#FF0000",
+                strokeOpacity: 1.0,
+                strokeWeight: 2,
+            });
+        }
+        if(map.zoom > 14) {
+            if(markers2 != ''){
+                markers2 = newMarkers(3, ["영변 원자력 발전소","영변 증기 발전소 1지부","영변 증기 발전소 2지부",".."], zoomTarget3);
+            }markerShowAll(markers2, map)
+
+            flightPath.setVisible(true);
+            flightPath.setMap(map);
+            flag = true;
+        } else if (map.zoom < 10) {
+            hideAll(markers2)
+            //markerShowAll(markers, map)
+            if(flag == true) {
+               aniHandler = window.requestAnimationFrame(animate);
+
+            }
+            //markers = newMarkers(json[0].location.length, json[0].location, target)
+            flag = false;
+        }else {
+            hideAll(markers_3)
+            hideAll(markers2)
+            flightPath.setVisible(false)
+        }
+
+    });
+
+    map.addListener("zoom_changed", (c) => {
+        //줌했을때 물리노드 보이는 좌표
+        zoomTarget4= [target_4[3],
+            { lat : 40.95816, lng : 126.60888 },
+            { lat : 40.95811, lng : 126.61243 },
+            { lat : 40.95883, lng : 126.61385 },
+            { lat : 40.95850, lng : 126.60760 }]
+        zoomTarget = zoomTarget.concat([zoomTarget4[1], zoomTarget4[2], zoomTarget4[3], zoomTarget4[4], zoomTarget4[0], zoomTarget4[1]])
+        if(flightPath != null) {
+            flightPath = new google.maps.Polyline({
+                path: zoomTarget4,
+                geodesic: true,
+                strokeColor: "#FF0000",
+                strokeOpacity: 1.0,
+                strokeWeight: 2,
+            });
+        }
+        if(map.zoom > 14) {
+            if(markers2 != ''){
+                markers2 = newMarkers(4, ["고려국방대학원 공학관","강계 정밀기계연합공장", "고려국방대학원 인문관", "고려국방대학원 원자력융합 대학원"], zoomTarget4);
+            }markerShowAll(markers2, map)
+
+            flightPath.setVisible(true);
+            flightPath.setMap(map);
+            flag = true;
+        } else if (map.zoom < 10) {
+            hideAll(markers2)
+            //markerShowAll(markers, map)
+            if(flag == true) {
+               aniHandler = window.requestAnimationFrame(animate);
+
+            }
+            //markers = newMarkers(json[0].location.length, json[0].location, target)
+            flag = false;
+        }else {
+            hideAll(markers_4)
+            hideAll(markers2)
+            flightPath.setVisible(false)
+        }
+    });
+
+    map.addListener("zoom_changed", (d) => {
+        //줌했을때 물리노드 보이는 좌표
+        zoomTarget5= [target_5[3],
+            { lat : 39.02392, lng : 125.74630 },
+            { lat : 39.01773, lng : 125.74469 },
+            { lat : 39.02033, lng : 125.74918 },
+            { lat : 39.02117, lng : 125.75305 }]
+        zoomTarget = zoomTarget.concat([zoomTarget5[0], zoomTarget5[1], zoomTarget5[2], zoomTarget5[3], zoomTarget[3]])
+        if(flightPath != null) {
+            flightPath = new google.maps.Polyline({
+                path: zoomTarget5,
+                geodesic: true,
+                strokeColor: "#FF0000",
+                strokeOpacity: 1.0,
+                strokeWeight: 2,
+            });
+        }
+        if(map.zoom > 14) {
+            if(markers2 != ''){
+                markers2 = newMarkers(4, ["조선노동당 본부","로씨야 대사관", "조선노동당 1호 청사", "인민대학습당"], zoomTarget5);
+            }markerShowAll(markers2, map)
+
+            flightPath.setVisible(true);
+            flightPath.setMap(map);
+            flag = true;
+        } else if (map.zoom < 10) {
+            hideAll(markers2)
+            //markerShowAll(markers, map)
+            if(flag == true) {
+               aniHandler = window.requestAnimationFrame(animate);
+
+            }
+            //markers = newMarkers(json[0].location.length, json[0].location, target)
+            flag = false;
+        }else {
+            hideAll(markers_5)
+            hideAll(markers2)
+            flightPath.setVisible(false)
+        }
+    });
     window.requestAnimationFrame(animate);
 
     return overlay;
