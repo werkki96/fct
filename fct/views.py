@@ -1,22 +1,21 @@
 from django.shortcuts import render
 
-
+m_key = 'AIzaSyAtWsRW1ftU1ix7rskfEQWXUt70hZqJsOQ'
 # create your views here.
 def index(request):
     ipChk = request.POST.get("test")
     if ipChk is None:
-        print("None22")
+        #print("None22")
         ipChk = "-"
     else:
         print(request.POST.get("test"))
 
-    m_key = 'AIzaSyBSCfYSvhqS17N9skfLIzThSVNea5mvEBs'
 
     context = {
         'ip': ipChk,
         'm_keys': m_key,
     }
-    response = render(request, 'GeoMap.html', context)
+    response = render(request, 'ThreatTrafic.html', context)
     return response
 
 
@@ -26,7 +25,7 @@ def inner_network(request):
         ipChk = "-"
     else:
         print(request.POST.get("ip"))
-    m_key = 'AIzaSyBSCfYSvhqS17N9skfLIzThSVNea5mvEBs'
+
     context = {
         'ip': ipChk,
         'm_keys': m_key,
@@ -35,7 +34,6 @@ def inner_network(request):
     return response
 
 def maps(request, mno):
-    m_key = 'AIzaSyBSCfYSvhqS17N9skfLIzThSVNea5mvEBs'
     context = {
         'm_keys': m_key,
     }
@@ -44,7 +42,6 @@ def maps(request, mno):
 
 
 def test(request):
-    m_key = 'AIzaSyBSCfYSvhqS17N9skfLIzThSVNea5mvEBs'
     context = {
         'm_keys': m_key,
     }
@@ -52,7 +49,6 @@ def test(request):
     return response
 
 def base(request):
-    m_key = 'AIzaSyBSCfYSvhqS17N9skfLIzThSVNea5mvEBs'
     context = {
         'm_keys': m_key,
     }

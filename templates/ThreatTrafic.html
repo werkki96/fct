@@ -9,71 +9,17 @@
                     <div class=" col-md-12 col-xl-12 card grid-margin stretch-card">
                         <div class="card-body">
                             <div class="d-flex flex-row justify-content-between">
-                                <h4 class="card-title">범례</h4>
-                            </div>
-                            <div class="preview-list">
-                                <table class="table">
-                                    <tr>
-                                        <th colspan="2">
-                                            <span class="text-primary font-weight-bold">시설</span>
-                                        </th>
-                                    </tr>
-                                    <tr>
-                                        <td style="width:20%"><img src="{% static "img/icons/nuclear.png" %}" width="48" height="48" alt=""></td>
-                                        <td><span class="text-dark font-weight-bold">원자력 발전소</span></td>
-                                    </tr>
-                                    <tr>
-                                        <td style="width:20%"><img src="{% static "img/icons/factory.png" %}" width="48" height="48" alt=""></td>
-                                        <td><span class="text-dark font-weight-bold">산업공장</span></td>
-                                    </tr>
-                                    <tr>
-                                        <td style="width:20%"><img src="{% static "img/icons/missile.png" %}" width="48" height="48" alt=""></td>
-                                        <td><span class="text-dark font-weight-bold">군수공장</span></td>
-                                    </tr>
-                                    <tr>
-                                        <td style="width:20%"><img src="{% static "img/icons/school.png" %}" width="48" height="48" alt=""></td>
-                                        <td><span class="text-dark font-weight-bold">학교</span></td>
-                                    </tr>
-                                </table>
-                                <table class="table">
-                                    <tr>
-                                        <th colspan="2">
-                                            <span class="text-primary font-weight-bold">IT 장비</span>
-                                        </th>
-                                    </tr>
-                                    <tr>
-                                        <td style="width:20%"><img src="{% static "img/icons/PC.png" %}" width="48" height="48" alt=""></td>
-                                        <td><span class="text-dark font-weight-bold">PC</span></td>
-                                    </tr>
-                                    <tr>
-                                        <td style="width:20%"><img src="{% static "img/icons/router.png" %}" width="48" height="48" alt=""></td>
-                                        <td><span class="text-dark font-weight-bold">Router</span></td>
-                                    </tr>
-                                    <tr>
-                                        <td style="width:20%"><img src="{% static "img/icons/server.png" %}" width="48" height="48" alt=""></td>
-                                        <td><span class="text-dark font-weight-bold">Server</span></td>
-                                    </tr>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                    <div class=" col-md-12 col-xl-12 card grid-margin stretch-card">
-                        <div class="card-body">
-                            <div class="d-flex flex-row justify-content-between">
                                 <h4 class="card-title">위협 로그</h4>
                             </div>
                             <div class="preview-list">
                                 <table class="table" id="tb_threat_log">
-                                    <tr>
-                                        <td class="text-danger" style="width:50%;">서울 ----------------> 중국</td>
-                                        <td><span class="text-summary font-weight-bold">네트워크 이동</span></td>
-                                    </tr>
+                                    <tbody></tbody>
                                 </table>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="col-md-6 col-xl-6 grid-margin stretch-card">
+                <div class="col-md-6 col-xl-9 grid-margin stretch-card" id="mapDiv">
                     <div class="card">
                         <div class="card-body">
                             <h4 class="card-title">Maps</h4>
@@ -82,38 +28,15 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-12 col-xl-3 grid-margin stretch-card">
+                <div class="col-md-12 col-xl-3 grid-margin stretch-card d-none" id="threatDetailDiv">
                     <div class="card">
-                        <div class="card-body" style="flex:0.01 1;">
-                            <h3 class="card-title">김일성 종합대학</h3>
-                        </div>
-                        <hr style="background-color: white;">
-                        <div class="card-body" style="flex:0.05 1;">
-                            <h4 class="card-title text-info">주소</h4>
-                            <span class="text-dark">조선민주주의인민공화국 평양 직할시 평양</span>
-                        </div>
-                        <div class="card-body" style="flex:0.05 1;">
-                            <h4 class="card-title text-info">위경도</h4>
-                            <span class="text-dark">39.058678662262984, 125.76824421680736</span>
-                        </div>
-                        <div class="card-body" style="flex:0.05 1;">
-                            <h4 class="card-title text-info">외부 IP 대역대</h4>
-                            <span class="text-dark">175.45.176.0-255</span>
-                        </div>
-                        <div class="card-body" style="flex:0.05 1;">
-                            <h4 class="card-title text-info">내부 IP 대역대</h4>
-                            <span class="text-dark">10.240.100.0-255</span>
-                        </div>
-                        <div class="card-body" style="flex:0.05 1;">
-                            <h4 class="card-title text-info">네트워크 구조 가시화</h4>
-                            <a class="text-primary" data-toggle="modal" data-target="#detailNetworks" style="cursor:pointer;" >[자세히]</a>
-                        </div>
-                        <div class="card-body" style="flex:0.05 1;">
-                            <h4 class="card-title text-info">기타</h4>
-                            <p>
-                                <a href='http://www.ryongnamsan.edu.kp/' class="text-primary">http://www.ryongnamsan.edu.kp/</a>
-                            </p>
-                            <img src="https://img3.yna.co.kr/photo/yna/YH/2016/09/29/PYH2016092927520001300_P4.jpg" alt="" width="100%" >
+                        <div class="card-body">
+                            <table class="table" id="tb_threat_log_detail">
+                                <tr>
+                                    <td colspan="3">위협 트래픽 상세</td>
+                                    <td class="text-right"><a href="javascript:closeLogDetail();"><i class="align-middle" data-feather="minus"></i></a></td>
+                                </tr>
+                            </table>
                         </div>
                     </div>
                 </div>
@@ -174,7 +97,7 @@
         const GoogleMapsOverlay = deck.GoogleMapsOverlay;
         const TripsLayer = deck.TripsLayer;
         const DATA_URL = "{% static 'test.json' %}";
-        const JSONS = $.getJSON(DATA_URL)
+        const JSONS = $.getJSON(DATA_URL);
         {#const LOOP_LENGTH =#}
         let map = null;
         let markers = []

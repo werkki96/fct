@@ -130,19 +130,81 @@ const icons =  function(google) {
     };
 
 }
+function openLogDetail(json) {
+    table = $('#tb_threat_log_detail tbody');
+    table.empty();
+    if($('#threatDetailDiv').hasClass('d-none')) {
+        if ($('#mapDiv').hasClass('col-xl-9') && !$('#mapDiv').hasClass('col-xl-6')) {
+            $('#mapDiv').removeClass('col-xl-9')
+            $('#mapDiv').addClass('col-xl-6')
+            $('#threatDetailDiv').removeClass('d-none')
+        }
+    }
+    console.log(json)
 
+    for(let i = 0;i<json.path.length-1;i++) {
+        threat_type = "네트워크 경유"
+        if (i == json.timestamps.length - 1) threat_type = "위협발생"
+        // 1 row
+        table.append(
+            '<tr>' +
+            '<td style="width:5%;">'+i+'</td>' +
+            '<td style="width:30%;">'+json.location[i]+'</td>' +
+            '<td style="width:30%;">'+json.location[i+1]+'</td>' +
+            '<td>'+threat_type+'</td>' +
+            '</tr>');
+        // 2 row
+        table.append(
+            '<tr>' +
+            '<td>'+json.location[i]+'</td>' +
+            '<td colspan="3">' +
+            'ip: ' + json.location[i] +
+            '<br>위경도: ' + json.path[i][0] + ', ' + json.path[i][1] +
+            '<br>소유자 : ???' +
+            '<br>트래픽 전송 시간: ' + json.timestamps[i] +
+            '</td>' +
+            '</tr>');
+        // 3 row
+        table.append(
+            '<tr>' +
+            '<td>'+json.location[i+1]+'</td>' +
+            '<td colspan="3">' +
+            'ip: ' + json.location[i+1] +
+            '<br>위경도: ' + json.path[i+1][0] + ', ' + json.path[i+1][1] +
+            '<br>소유자 : ???' +
+            '<br>트래픽 전송 시간: ' + json.timestamps[i+1] +
+            '</td>' +
+            '</tr>');
+    }
+}
 
-function AddLog(startLoc, endLoc, type){
+function closeLogDetail() {
+    div = $('#threatDetailDiv');
+    div.addClass('d-none')
+    if(!$('#mapDiv').hasClass('col-xl-9') && $('#mapDiv').hasClass('col-xl-6')) {
+        $('#mapDiv').removeClass('col-xl-6')
+        $('#mapDiv').addClass('col-xl-9')
+    }
+}
+function AddLog(startLoc, endLoc, type, json){
     tr = document.createElement('tr')
-    location_td = document.createElement('td')
+    start_td = document.createElement('td')
+    end_td = document.createElement('td')
     type_td = document.createElement('td')
-    location_td.setAttribute('class','text-danger');
-    location_td.setAttribute('style','width:65%');
-    location_td.innerText = startLoc+" ------------------------> "+endLoc;
+    tr.onclick = function() {
+        openLogDetail(json)
+    }
+    start_td.setAttribute('class','text-danger');
+    start_td.setAttribute('style','width:30%');
+    start_td.innerText = startLoc;
+    end_td.setAttribute('class','text-danger');
+    end_td.setAttribute('style','width:30%');
+    end_td.innerText = endLoc;
     type_td.setAttribute('class','text-summary');
     type_td.setAttribute('class','font-weight-bold');
     type_td.innerText = type;
-    tr.appendChild(location_td)
+    tr.appendChild(start_td)
+    tr.appendChild(end_td)
     tr.appendChild(type_td)
     return tr;
 }
@@ -157,10 +219,10 @@ function newMarkers(length, markerText, positions, map){
             map: map,
             label: {
                 text: markerText[i],
-                color: "#000000",
+                //color: "#000000",
                 fontWeight: "bold",
                 fontSize: "16px",
-                className: "map-label"
+                className: "marker-labels"
             },
             id:"test"
         }));
@@ -297,13 +359,14 @@ function AnimationOverlayView(json) {
     loop_length = json[0].timestamps[json[0].timestamps.length-1]+100
     //console.log(loop_length)
     let currentTime = 0;
-    const props = {
+    let props = {
         id: "trips",
         data: DATA_URL,
+        getDataId: (d) => d.id,
         getPath: (d) => d.path,
         getTimestamps: (d) => d.timestamps,
         getColor: (d) => VENDOR_COLORS[d.vendor],
-        opacity: 1,
+        opacity: 0,
         widthMinPixels: 5,
         trailLength: 80,
         currentTime,
@@ -349,7 +412,7 @@ function AnimationOverlayView(json) {
                 if (j > 0 && j < json[0].timestamps.length) {
                     threat_type = "네트워크 경유"
                     if (j == json[0].timestamps.length - 1) threat_type = "위협발생"
-                    $('#tb_threat_log').append(AddLog(json[0].location[j - 1], json[0].location[j], threat_type))
+                    $('#tb_threat_log tbody').append(AddLog(json[0].location[j - 1], json[0].location[j], threat_type, json[0]))
                 }
                 if (j > 1){
                     markers[j - 2].setMap(null);
@@ -406,23 +469,28 @@ function AnimationOverlayView(json) {
                     markers_15[i].setMap(null);
                     markers_16[i].setMap(null);
                 }
-                $('#tb_threat_log').html('');
+                $('#tb_threat_log tbody').empty();
                 j = 0;
             }
         }
         if(!flag) {
             aniHandler = window.requestAnimationFrame(animate);
+            if(props.opacity == 0) {
+                currentTime = 0;
+                show(0)
+            }
             props.opacity = 1;
+
         }
         else {
-            window.cancelAnimationFrame(aniHandler)
             props.opacity = 0;
+            window.cancelAnimationFrame(aniHandler)
             hideAll(markers)
         }
     }
 
     let j = 0;
-    $('#tb_threat_log').text('')
+    //$('#tb_threat_log').text('')
     //lat 오른쪽 왼쪽, lng 위아래
     // 북한 { lat: 39.058678662262984, lng: 125.76824421680736 }
     // 영국 { lat: 51.4510898289427, lng: -1.7277438152626 }
@@ -528,27 +596,27 @@ function AnimationOverlayView(json) {
     });
 
     markers_3[markers_3.length-1].addListener("click", (b) => {
-    map.setCenter(markers_3[markers_3.length-1].getPosition());
-    animateMapZoomTo(map, 18)
-    map.setZoom(18)
-    hideAll(markers_3)
-    flag = true
+        map.setCenter(markers_3[markers_3.length-1].getPosition());
+        animateMapZoomTo(map, 18)
+        map.setZoom(18)
+        hideAll(markers_3)
+        flag = true
     });
 
     markers_4[markers_4.length-1].addListener("click", (c) => {
-    map.setCenter(markers_4[markers_4.length-1].getPosition());
-    animateMapZoomTo(map, 18)
-    map.setZoom(18)
-    hideAll(markers_4)
-    flag = true
+        map.setCenter(markers_4[markers_4.length-1].getPosition());
+        animateMapZoomTo(map, 18)
+        map.setZoom(18)
+        hideAll(markers_4)
+        flag = true
     });
 
     markers_5[markers_5.length-1].addListener("click", (d) => {
-    map.setCenter(markers_5[markers_5.length-1].getPosition());
-    animateMapZoomTo(map, 18)
-    map.setZoom(18)
-    hideAll(markers_5)
-    flag = true
+        map.setCenter(markers_5[markers_5.length-1].getPosition());
+        animateMapZoomTo(map, 18)
+        map.setZoom(18)
+        hideAll(markers_5)
+        flag = true
     });
 
     flightPath = null;
@@ -582,7 +650,7 @@ function AnimationOverlayView(json) {
             hideAll(markers2)
             //markerShowAll(markers, map)
             if(flag == true) {
-               aniHandler = window.requestAnimationFrame(animate);
+                aniHandler = window.requestAnimationFrame(animate);
 
             }
             //markers = newMarkers(json[0].location.length, json[0].location, target)
@@ -623,7 +691,7 @@ function AnimationOverlayView(json) {
             hideAll(markers2)
             //markerShowAll(markers, map)
             if(flag == true) {
-               aniHandler = window.requestAnimationFrame(animate);
+                aniHandler = window.requestAnimationFrame(animate);
 
             }
             //markers = newMarkers(json[0].location.length, json[0].location, target)
@@ -664,7 +732,7 @@ function AnimationOverlayView(json) {
             hideAll(markers2)
             //markerShowAll(markers, map)
             if(flag == true) {
-               aniHandler = window.requestAnimationFrame(animate);
+                aniHandler = window.requestAnimationFrame(animate);
 
             }
             //markers = newMarkers(json[0].location.length, json[0].location, target)
@@ -706,7 +774,7 @@ function AnimationOverlayView(json) {
             hideAll(markers2)
             //markerShowAll(markers, map)
             if(flag == true) {
-               aniHandler = window.requestAnimationFrame(animate);
+                aniHandler = window.requestAnimationFrame(animate);
 
             }
             //markers = newMarkers(json[0].location.length, json[0].location, target)
@@ -747,12 +815,12 @@ function AnimationOverlayView(json) {
             hideAll(markers2)
             //markerShowAll(markers, map)
             if(flag == true) {
-               aniHandler = window.requestAnimationFrame(animate);
+                aniHandler = window.requestAnimationFrame(animate);
 
             }
             //markers = newMarkers(json[0].location.length, json[0].location, target)
             flag = false;
-        }else {
+        } else {
             hideAll(markers_5)
             hideAll(markers2)
             flightPath.setVisible(false)
