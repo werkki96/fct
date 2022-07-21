@@ -33,6 +33,7 @@ def inner_network(request):
     response = render(request, 'InnerNetwork.html', context)
     return response
 
+
 def maps(request, mno):
     context = {
         'm_keys': m_key,
@@ -48,9 +49,19 @@ def test(request):
     response = render(request, 'test.html', context)
     return response
 
+
 def base(request):
     context = {
         'm_keys': m_key,
     }
     response = render(request, 'base.html', context)
+    return response
+
+
+# 관심지역 내 내부망 가시화
+def logical_view_2d(request):
+    context = {
+        'm_keys': m_key,
+    }
+    response = render(request, 'logical-view-2d.html', context)
     return response
