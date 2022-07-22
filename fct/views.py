@@ -37,7 +37,7 @@ def geomap(request):
     context = {
         'm_keys': m_key,
     }
-    response = render(request, 'GeoMap.html', context)
+    response = render(request, 'map_01.html', context)
     return response
 
 
@@ -53,4 +53,13 @@ def base(request):
         'm_keys': m_key,
     }
     response = render(request, 'base.html', context)
+    return response
+
+
+# 관심지역 내 내부망 가시화
+def logical_view_2d(request):
+    context = {
+        'm_keys': m_key,
+    }
+    response = render(request, 'logical-view-2d.html', context)
     return response

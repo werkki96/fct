@@ -10,5 +10,6 @@ urlpatterns = [
     path('GeoMap', views.geomap, name='geomap'),
     path('test', views.test, name='test'),
     path('base', views.base, name='base'),
+    path('logical_view_2d', views.logical_view_2d, name='logical_view_2d'),
 ]
 
