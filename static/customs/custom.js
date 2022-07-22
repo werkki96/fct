@@ -584,7 +584,7 @@ function AnimationOverlayView(json) {
                     threat_type = "네트워크 경유"
                     if (j == json[0].timestamps.length - 1) threat_type = "위협발생"
                     for(i = 0; i < markers.length; i++){
-                    tbl.append(AddLog(json[0].location[j - 1], json[0].location[j], threat_type, json[0]));
+                    tbl.append(AddLog(json[i].location[j - 1], json[i].location[j], threat_type, json[i]));
                     }
                     tbl.parent().parent().height($('#map').height());
                     tbl.parent().parent().css('overflow', 'auto');
@@ -602,7 +602,7 @@ function AnimationOverlayView(json) {
             } else if (currentTime == loop_length - 1) {
 
             for (let i = 0; i < coordi.length; i++){
-                for (let j = 0; j < coordi[0].length; j++){
+                for (let j = 0; j < coordi[i].length; j++){
                     markers[i][j].setMap(null);
                 }
             }
@@ -681,7 +681,8 @@ function AnimationOverlayView(json) {
         if(map.zoom > 14) {
             if(markers2 == ''){
                 markers2 = newMarkers(5, ["종합대학","혁명사적관","학생빌딩","과학도서관",".."], zoomTarget);
-            }markerShowAll(markers2, map)
+            }
+            markerShowAll(markers2, map)
 
             flightPath.setVisible(true);
             flightPath.setMap(map);
