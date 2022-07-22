@@ -14,11 +14,6 @@
                             <div class="preview-list">
                                 <table class="table">
                                     <tr>
-                                        <th colspan="5">
-                                            <span class="text-primary font-weight-bold">물리 네트워크 및 보안 장비</span>
-                                        </th>
-                                    </tr>
-                                    <tr>
                                         <td style="width:20%"><img src="{% static "img/refresh-cl/router.png" %}" width="48" height="48" alt=""></td>
                                         <td><span class="text-dark font-weight-bold">라우터</span></td>
                                     </tr>
@@ -44,11 +39,7 @@
                                     </tr>
                                 </table>
                             </div>
-                            <div class="preview-list">
-                                <table class="table" id="tb_threat_log">
-                                    <tbody></tbody>
-                                </table>
-                            </div>
+
                         </div>
                     </div>
                 </div>
@@ -57,19 +48,22 @@
                         <div class="card-body">
                             <h4 class="card-title">Maps</h4>
                             {# Map Sector #}
-                            <div id="mynetwork" style="border: 1px solid white; width: 100%; height:600px;background-color:white">
+                            <div id="logical-view-2d" style="border: 1px solid white; width: 100%; height:600px;background-color:white">
                                 <canvas width="100%" height="100%"></canvas>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="col-md-12 col-xl-3 grid-margin stretch-card d-none" id="threatDetailDiv">
+                <div class="col-md-12 col-xl-3 grid-margin stretch-card d-none" id="nodeDetailDiv">
                     <div class="card">
                         <div class="card-body">
-                            <table class="table" id="tb_threat_log_detail">
+                            <div class="d-flex flex-row justify-content-between">
+                                <h4 class="card-title">물리 네트워크 노드 정보</h4>
+                            </div>
+                            <table class="table" id="tb_node_detail">
                                 <tr>
-                                    <td colspan="3">위협 트래픽 상세</td>
-                                    <td class="text-right"><a href="javascript:closeLogDetail();"><i class="align-middle" data-feather="minus"></i></a></td>
+                                    <td colspan="3">상세</td>
+                                    <td class="text-right"><a href="javascript:closeNodeDetail();"><i class="align-middle" data-feather="minus"></i></a></td>
                                 </tr>
                             </table>
                         </div>
@@ -92,6 +86,6 @@
 
     </script>
     <!-- network logical view javascript -->
-    <script src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+    <script src="{% static 'js/vis-network.min.js'%}"></script>
     <script src="{% static 'customs/logical-view-2d.js'%}"></script>
 {% endblock %}
