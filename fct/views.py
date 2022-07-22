@@ -37,7 +37,7 @@ def geomap(request):
     context = {
         'm_keys': m_key,
     }
-    response = render(request, 'map_01.html', context)
+    response = render(request, 'GeoMap.html', context)
     return response
 
 
