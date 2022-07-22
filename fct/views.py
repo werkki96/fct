@@ -61,5 +61,13 @@ def logical_view_2d(request):
     context = {
         'm_keys': m_key,
     }
+    if request.method == 'POST':
+        facility = request.POST['facility']
+        coord = request.POST['coord']
+        context = {
+            'm_keys': m_key,
+            'facility': facility,
+            'coord': coord
+        }
     response = render(request, 'logical-view-2d.html', context)
     return response

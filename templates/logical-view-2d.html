@@ -72,6 +72,9 @@
             </div>
         </div>
 
+        <input type="hidden" id="facility" value="{{ facility }}">
+        <input type="hidden" id="coord" value="{{ coord }}">
+
         <!-- content-wrapper ends -->
         <!-- partial:partials/_footer.html -->
 
@@ -88,4 +91,5 @@
     <!-- network logical view javascript -->
     <script src="{% static 'js/vis-network.min.js'%}"></script>
     <script src="{% static 'customs/logical-view-2d.js'%}"></script>
+    <script src="{% static 'customs/network_data.json'%}"></script>
 {% endblock %}
