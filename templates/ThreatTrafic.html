@@ -43,30 +43,6 @@
             </div>
         </div>
 
-        <!-- modals -->
-        <div class="modal fade" id="detailNetworks" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLabel">김일성 종합대학 네트워크</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <!--네트워크 접점 및 노드 가시화-->
-                        <div id="mynetwork" style="border: 1px solid white; width: 100%; height:600px;background-color:white">
-                            <canvas width="100%" height="100%"></canvas>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                        <button type="button" class="btn btn-primary">Save changes</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <!-- /modals -->
         <!-- content-wrapper ends -->
         <!-- partial:partials/_footer.html -->
 
@@ -79,20 +55,10 @@
     <!-- container-scroller -->
     {#//test = '[{"vendor": 0, "path": [   [127.2899, 37.63124],   [ 112.0221605275621,  27.467339403723],   [81.15063376483022, 23.639397214043683], [125.76824421680736, 39.058678662262984]],    "timestamps": [ 1, 100, 200, 300],    "location": ["서울", "중국", "인도", "북한"]  }]'#}
     {#  <script type="text/javascript" src="{% static 'test.json'%}"></script>#}
-    <script src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
     <script>
-        var nodes = null;
-        var edges = null;
-        var network = null;
         let overlays;
         var DIR = "{% static 'img/refresh-cl/'%}";
-        var EDGE_LENGTH_MAIN = 150;
-        var EDGE_LENGTH_SUB = 50;
-        x = 0
-        y = 0
         // Called when the Visualization API is loaded.
-
-        draw(DIR);
 
         const GoogleMapsOverlay = deck.GoogleMapsOverlay;
         const TripsLayer = deck.TripsLayer;
@@ -126,6 +92,7 @@
         const target_14 = [{ lat : -15.68335, lng : -47.80003 }, { lat : 59.32393, lng : 18.06198  }, { lat: 22.29579, lng: 114.13927 }, { lat : 40.95853, lng : 126.60763 }];
         const target_15 = [{ lat : -12.00122, lng : -77.00774 }, { lat :4.74056, lng : -74.04241 }, { lat: 55.76633, lng:37.63332 }, { lat : 40, lng : 127 }];
         const target_16 = [{ lat :59.98176, lng : 10.58528 }, { lat: 38.90535, lng: -77.03427 }, { lat: 55.76633, lng:37.63332 }, { lat : 40, lng : 127 }];
+        //const temp = [ { lat: 39.058678662262984, lng: 125.76824421680736 }, { lat: 40.058678662262984, lng: 125.76824421680736 }, { lat: 39.058678662262984, lng: 126.76824421680736 }, { lat: 39.158678662262984, lng: 125.76824421680736 },{ lat: 39.858678662262984, lng: 125.06824421680736 },{ lat: 39.77678662262984, lng: 125.00824421680736 },{ lat: 39.058678662262984, lng: 125.76824421680736 },{ lat: 39.058678662262984, lng: 125.76824421680736 }];
 
         function initMap(listener) {
             //37.63124, 127.2899 (seoul), 27.4673394037323, 112.0221605275621(후난성), 23.639397214043683, 81.15063376483022(인도 어딘가), 39.058678662262984, 125.76824421680736(김일성종합대학)
@@ -134,23 +101,21 @@
                 center: target[0],
                 {#styles: map_styles,#}
                 mapTypeId: "hybrid",
+                minZoom:3,
             });
         }
 
         window.initMap = initMap;
         function ThreatAnimationLayer(){
             overlay = AnimationOverlayView(JSONS.responseJSON)
-
             overlay.setMap(map);
+            // 지형정보 가시화를 위한 임시 마커
+            //markerShowAll(markers, map)
+            //markers = newMarkers(temp.length, temp, temp)
         }
         setTimeout(function(){
             ThreatAnimationLayer()
         },500)
 
-        aa = setInterval(function(){
-            if($('#detailNetworks').hasClass('show')) network.moveTo({ position: {x:0, y:0}, scale:0.8})
-            if(network.getViewPosition().x == 0 && network.getViewPosition().y == 0)
-                clearInterval(aa);
-        },500);
     </script>
 {% endblock %}

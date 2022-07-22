@@ -78,10 +78,189 @@ const map_styles = [
         stylers: [{ color: "#17263c" }],
     },
 ];
+const STATIC_FOLDERS = "/static/img/icons/";
 
 
+/*
+* Start legend icon list init
+* use: GeoMap.html
+* writer: 장지수
+* update: 2022/07/21
+* */
+//체크박스 형태로 필요한 아이콘만 볼 수 있게 설정
+//https://jsfiddle.net/wpea43L1/
+const LEGEND_ICONS = {
+    "airport":{
+        url:STATIC_FOLDERS + "airport-icon.png",
+        name: "비행장",
+        openType: true,
+    },
+    "bridge": {
+        url: STATIC_FOLDERS + "bridge-icon.png",
+        name: "다리",
+        openType: true,
+    },
+    "camera":{
+        url:STATIC_FOLDERS + "camera-icon.png",
+        name:"관광명소",
+        openType:true,
+    },
+    "civic_bldg":{
+        url:STATIC_FOLDERS + "civic_bldg-icon.png",
+        name:"대사관",
+        openType:true,
+    },
+    "ferriswheel":{
+        url:STATIC_FOLDERS + "ferriswheel-icon.png",
+        name:"놀이공원",
+        openType:true,
+    },
+    "historic":{
+        url:STATIC_FOLDERS + "historic-icon.png",
+        name:"역사적명소",
+        openType:true,
+    },
+    "library":{
+        url:STATIC_FOLDERS + "library-icon.png",
+        name:"도서관",
+        openType:true,
+    },
+    "lodging":{
+        url:STATIC_FOLDERS + "lodging-icon.png",
+        name:"호텔",
+        openType:true,
+    },
+    "restaurant":{
+        url:STATIC_FOLDERS + "restaurant-icon.png",
+        name:"식당",
+        openType:true,
+    },
+    "school":{
+        url:STATIC_FOLDERS + "school-icon.png",
+        name:"교육시설",
+        openType:true,
+    },
+    "park":{
+        url:STATIC_FOLDERS + "tree-icon.png",
+        name:"공원",
+        openType:true,
+    },
+    "metro":{
+        url:STATIC_FOLDERS + "metro-icon.png",
+        name:"지하철",
+        openType:true,
+    },
+    "transit":{
+        url:STATIC_FOLDERS + "transit-icon.png",
+        name:"기차",
+        openType:true,
+    },
+    "parking":{
+        url:STATIC_FOLDERS + "parking-icon.png",
+        name:"parking",
+        openType:true,
+    },
+    "bgp": {
+        url:STATIC_FOLDERS + "router.png",
+        name:"AS Router",
+        openType:true,
+    },
+};
+function initLegends() {
+    let tbl = $('.legends-list #openLocations');
+    $.each(LEGEND_ICONS, function(key, val){
+        tbl.append(
+            "<tr>" +
+            "<td style='width:20%;' class='text-center'>" +
+            "<img src='" + val.url + "' alt='" + val.name + "' width='34.5' height='48'>" +
+            "</td>" +
+            "<td>" +
+            "<span class='text-dark font-weight-bold'>" + val.name + "</span>" +
+            "</td>" +
+            "</tr>");
+    });
+    tbl.parent().height($('#map').height())
+    tbl.parent().css('overflow','auto')
+}
+/*
+* End legend icon list init
+* */
 
-//{# 아이콘 정의 #}
+/*
+* Start get place detail
+* use: GeoMap.html
+* writer: 장지수
+* update: 2022/07/21
+* */
+let testde;
+function getPlaceDetail(event) {
+    if(event.placeId) {
+        // usable fields: address_components, formatted_address, business_status, formatted_phone_number, geometry
+        // plus_code, icon, international_phone_number, name, opening_hours
+        // photos, place_id, rating, reviews, types, url, vicinity, website
+        let request = {
+            placeId: event.placeId,
+            fields: [
+                'name', 'rating', 'formatted_phone_number', 'geometry' , 'formatted_address', 'address_component'
+                , 'plus_code', 'icon', 'international_phone_number', 'opening_hours'
+                , 'photos', 'place_id', 'reviews', 'types', 'url', 'vicinity', 'website', 'business_status'
+            ]
+        };
+
+        service = new google.maps.places.PlacesService(map);
+        service.getDetails(request, callback);
+
+    }
+}
+function callback(place, status) {
+    if (status == google.maps.places.PlacesServiceStatus.OK) {
+        testde = place
+        let photo = place.photos;
+        let addr = place.formatted_address;
+        let call_num = place.formatted_phone_number;
+        let location = place.geometry.location; //lat, lng
+        let website = place.website;
+        let gmap_url = place.url;
+        let type = place.types;
+        let review = place.reviews;
+        let name = place.name;
+        let place_div = $('#place_detail');
+        place_div.empty();
+
+        if(name != undefined)
+            place_div.append(
+                "<div class='card-body' style='flex:0.01 1;'>" +
+                "<h3 class='card-title'>" + name + "</h3>" +
+                "</div>"
+            );
+        if(addr != undefined)
+            place_div.append(makeContent("주소", addr));
+        if(location != undefined)
+            place_div.append(makeContent("위경도", location.lat() + ", " + location.lng()));
+        if(call_num != undefined)
+            place_div.append(makeContent("전화번호", call_num));
+        if(type != undefined)
+            place_div.append(makeContent("위경도", location.lat + ", " + location.lng));
+        if(location != undefined)
+            place_div.append(makeContent("위경도", location.lat + ", " + location.lng));
+        // if(location != undefined)
+        //     place_div.append(makeContent("위경도", location.lat + ", " + location.lng));
+        // if(location != undefined)
+        //     place_div.append(makeContent("위경도", location.lat + ", " + location.lng));
+        // if(location != undefined)
+        //     place_div.append(makeContent("위경도", location.lat + ", " + location.lng));
+    }
+}
+function makeContent(title, content) {
+    html = "<div class='card-body' style='flex:0.01 1;'>" +
+            "<h4 class='card-title text-info'>" + title + "</h4>" +
+            "<span class='text-dark'>" + content + "</span>" +
+            "</div>";
+    return html;
+}
+/*
+* End get place detail
+* */
 const icons =  function(google) {
     return {
         nuclear: {
@@ -128,8 +307,8 @@ const icons =  function(google) {
             scaledSize: new google.maps.Size(25, 25)
         },
     };
-
 }
+
 function openLogDetail(json) {
     table = $('#tb_threat_log_detail tbody');
     table.empty();
@@ -194,10 +373,10 @@ function AddLog(startLoc, endLoc, type, json){
     tr.onclick = function() {
         openLogDetail(json)
     }
-    start_td.setAttribute('class','text-danger');
+    start_td.setAttribute('class','text- font-weight-bold');
     start_td.setAttribute('style','width:30%');
     start_td.innerText = startLoc;
-    end_td.setAttribute('class','text-danger');
+    end_td.setAttribute('class','text- font-weight-bold');
     end_td.setAttribute('style','width:30%');
     end_td.innerText = endLoc;
     type_td.setAttribute('class','text-summary');
@@ -232,7 +411,7 @@ function newMarkers(length, markerText, positions, map){
 
 
 function animateMapZoomTo(map, targetZoom) {
-    var currentZoom = arguments[2] || map.getZoom();
+    let currentZoom = arguments[2] || map.getZoom();
     if (currentZoom != targetZoom) {
         google.maps.event.addListenerOnce(map, 'zoom_changed', function (event) {
             animateMapZoomTo(map, targetZoom, currentZoom + (targetZoom > currentZoom ? 1 : -1));
@@ -268,7 +447,7 @@ function draw(dir) {
     });
     edges.push({ from: 1, to: 2, length: EDGE_LENGTH_MAIN });
     arr = ["169.0.1.16","169.0.1.17","169.0.1.18","169.0.1.19"]
-    for (var i = 3; i <= 6; i++) {
+    for (let i = 3; i <= 6; i++) {
         nodes.push({
             id: i,
             label: arr[i-3],
@@ -308,7 +487,7 @@ function draw(dir) {
     });
     edges.push({ from: 11, to: 12, length: EDGE_LENGTH_MAIN });
     arr = ["169.14.21.16","169.14.21.17","169.14.21.18","169.14.21.19"]
-    for (var i = 13; i <= 16; i++) {
+    for (let i = 13; i <= 16; i++) {
         nodes.push({
             id: i,
             label: arr[i-13],
@@ -342,12 +521,12 @@ function draw(dir) {
     edges.push({ from: 11, to: 104, length: EDGE_LENGTH_SUB });
 
     // create a network
-    var container = document.getElementById("mynetwork");
-    var data = {
+    let container = document.getElementById("mynetwork");
+    let data = {
         nodes: nodes,
         edges: edges,
     };
-    var options = {};
+    let options = {};
     network = new vis.Network(container, data, options);
 }
 
@@ -621,7 +800,7 @@ function AnimationOverlayView(json) {
 
     flightPath = null;
     // {# marker zoom up event #}
-    map.addListener("zoom_changed", (e) => {
+    map.addListener("zoom_changed", function (e) {
         //줌했을때 물리노드 보이는 좌표
         zoomTarget = [target[3],
             {lat:39.05807855450129, lng:125.76711363450084},
@@ -646,7 +825,7 @@ function AnimationOverlayView(json) {
             flightPath.setVisible(true);
             flightPath.setMap(map);
             flag = true;
-        } else if (map.zoom < 10) {
+        } else if (map.zoom < 10 && map.zoom >= 3) {
             hideAll(markers2)
             //markerShowAll(markers, map)
             if(flag == true) {
@@ -655,12 +834,11 @@ function AnimationOverlayView(json) {
             }
             //markers = newMarkers(json[0].location.length, json[0].location, target)
             flag = false;
-        }else {
+        } else {
             hideAll(markers)
             hideAll(markers2)
             flightPath.setVisible(false)
         }
-
     });
 
     map.addListener("zoom_changed", (a) => {
@@ -696,7 +874,7 @@ function AnimationOverlayView(json) {
             }
             //markers = newMarkers(json[0].location.length, json[0].location, target)
             flag = false;
-        }else {
+        } else {
             hideAll(markers_2)
             hideAll(markers2)
             flightPath.setVisible(false)
@@ -737,7 +915,7 @@ function AnimationOverlayView(json) {
             }
             //markers = newMarkers(json[0].location.length, json[0].location, target)
             flag = false;
-        }else {
+        } else {
             hideAll(markers_3)
             hideAll(markers2)
             flightPath.setVisible(false)
@@ -779,7 +957,7 @@ function AnimationOverlayView(json) {
             }
             //markers = newMarkers(json[0].location.length, json[0].location, target)
             flag = false;
-        }else {
+        } else {
             hideAll(markers_4)
             hideAll(markers2)
             flightPath.setVisible(false)

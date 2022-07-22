@@ -7,7 +7,7 @@ app_name = "fct"
 urlpatterns = [
     path('', views.index, name='index'),
     path('inner_network', views.inner_network, name='inner_network'),
-    path('map/<int:mno>', views.maps, name='maps'),
+    path('GeoMap', views.geomap, name='geomap'),
     path('test', views.test, name='test'),
     path('base', views.base, name='base'),
 ]
