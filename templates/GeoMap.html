@@ -43,7 +43,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-6 col-xl-6 grid-margin stretch-card">
+                <div class="col-md-9 col-xl-9 grid-margin stretch-card" id="mapDivs">
                     <div class="card">
                         <div class="card-body">
                             <h4 class="card-title">Maps</h4>
@@ -53,37 +53,8 @@
                     </div>
                 </div>
                 <div class="col-md-12 col-xl-3 grid-margin stretch-card">
-                    <div class="card" id="place_detail">
-                        <div class="card-body" style="flex:0.01 1;">
-                            <h3 class="card-title">김일성 종합대학</h3>
-                        </div>
-                        <div class="card-body" style="flex:0.01 1;">
-                            <h4 class="card-title text-info">주소</h4>
-                            <span class="text-dark">조선민주주의인민공화국 평양 직할시 평양</span>
-                        </div>
-                        <div class="card-body" style="flex:0.05 1;">
-                            <h4 class="card-title text-info">위경도</h4>
-                            <span class="text-dark">39.058678662262984, 125.76824421680736</span>
-                        </div>
-                        <div class="card-body" style="flex:0.05 1;">
-                            <h4 class="card-title text-info">외부 IP 대역대</h4>
-                            <span class="text-dark">175.45.176.0-255</span>
-                        </div>
-                        <div class="card-body" style="flex:0.05 1;">
-                            <h4 class="card-title text-info">내부 IP 대역대</h4>
-                            <span class="text-dark">10.240.100.0-255</span>
-                        </div>
-                        <div class="card-body" style="flex:0.05 1;">
-                            <h4 class="card-title text-info">논리적 네트워크 구조 가시화</h4>
-                            <a class="text-primary" data-toggle="modal" data-target="#detailNetworks" style="cursor:pointer;" >[자세히]</a>
-                        </div>
-                        <div class="card-body" style="flex:0.05 1;">
-                            <h4 class="card-title text-info">기타</h4>
-                            <p>
-                                <a href='http://www.ryongnamsan.edu.kp/' class="text-primary">http://www.ryongnamsan.edu.kp/</a>
-                            </p>
-                            <img src="https://img3.yna.co.kr/photo/yna/YH/2016/09/29/PYH2016092927520001300_P4.jpg" alt="" width="100%" >
-                        </div>
+                    <div class="card d-none" id="place_detail">
+
                     </div>
                 </div>
             </div>
@@ -127,27 +98,14 @@
     {#  <script type="text/javascript" src="{% static 'test.json'%}"></script>#}
     <script src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
     <script>
-        var nodes = null;
-        var edges = null;
-        var network = null;
-        let overlays;
-        var DIR = "{% static 'img/refresh-cl/'%}";
-        var EDGE_LENGTH_MAIN = 150;
-        var EDGE_LENGTH_SUB = 50;
-        x = 0
-        y = 0
+        const DIR = "{% static 'img/refresh-cl/'%}";
         // Called when the Visualization API is loaded.
 
-        draw(DIR);
-
-        const GoogleMapsOverlay = deck.GoogleMapsOverlay;
-        const TripsLayer = deck.TripsLayer;
         const DATA_URL = "{% static 'test.json' %}";
         const JSONS = $.getJSON(DATA_URL)
         {#const LOOP_LENGTH =#}
         let map = null;
         let markers = []
-        let markers2 = []
         const VENDOR_COLORS = [
             [255, 0, 0],
             [0, 0, 255], // vendor #1
@@ -164,7 +122,7 @@
                 zoom: 4,
                 center: target[0],
                 {#styles: map_styles,#}
-                //mapTypeId: "hybrid",
+                mapTypeId: "hybrid",
                 minZoom:3,
             });
             map.addListener('click', (e) => getPlaceDetail(e));

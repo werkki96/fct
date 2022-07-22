@@ -194,6 +194,7 @@ function initLegends() {
 * */
 let testde;
 function getPlaceDetail(event) {
+
     if(event.placeId) {
         // usable fields: address_components, formatted_address, business_status, formatted_phone_number, geometry
         // plus_code, icon, international_phone_number, name, opening_hours
@@ -214,7 +215,6 @@ function getPlaceDetail(event) {
 }
 function callback(place, status) {
     if (status == google.maps.places.PlacesServiceStatus.OK) {
-        testde = place
         let photo = place.photos;
         let addr = place.formatted_address;
         let call_num = place.formatted_phone_number;
@@ -222,11 +222,10 @@ function callback(place, status) {
         let website = place.website;
         let gmap_url = place.url;
         let type = place.types;
-        let review = place.reviews;
+        //let review = place.reviews;
         let name = place.name;
         let place_div = $('#place_detail');
         place_div.empty();
-
         if(name != undefined)
             place_div.append(
                 "<div class='card-body' style='flex:0.01 1;'>" +
@@ -240,22 +239,75 @@ function callback(place, status) {
         if(call_num != undefined)
             place_div.append(makeContent("전화번호", call_num));
         if(type != undefined)
-            place_div.append(makeContent("위경도", location.lat + ", " + location.lng));
-        if(location != undefined)
-            place_div.append(makeContent("위경도", location.lat + ", " + location.lng));
-        // if(location != undefined)
-        //     place_div.append(makeContent("위경도", location.lat + ", " + location.lng));
-        // if(location != undefined)
-        //     place_div.append(makeContent("위경도", location.lat + ", " + location.lng));
-        // if(location != undefined)
-        //     place_div.append(makeContent("위경도", location.lat + ", " + location.lng));
+            place_div.append(makeContent("시설 정보", type[0].replace("_", " ")));
+        // if(review != undefined)
+        //     place_div.append(makeContent("리뷰", review));
+        if(website != undefined)
+            place_div.append(makeContent("홈페이지", "<a href='"+website+"' class='text-primary'>"+website+"</a>"));
+        if(gmap_url != undefined)
+            place_div.append(makeContent("구글지도에서 보기", "<a href='"+gmap_url+"' class='text-primary'>"+gmap_url+"</a>"));
+        if(photo != undefined)
+            place_div.append(makeContent("사진", photo));
+
+        if($('#mapDivs').hasClass('col-xl-9') && $('#mapDivs').hasClass('col-md-9')) {
+            place_div.removeClass('d-none')
+            $('#mapDivs').removeClass('col-xl-9')
+            $('#mapDivs').removeClass('col-md-9')
+            $('#mapDivs').addClass('col-xl-6')
+            $('#mapDivs').addClass('col-md-6')
+        }
     }
 }
 function makeContent(title, content) {
-    html = "<div class='card-body' style='flex:0.01 1;'>" +
+    let html = "";
+    if(typeof(content) != 'object') {
+        html = "<div class='card-body' style='flex:0.01 1;'>" +
             "<h4 class='card-title text-info'>" + title + "</h4>" +
             "<span class='text-dark'>" + content + "</span>" +
             "</div>";
+    } else {
+        if(title == "사진") {
+            let li = "";
+            let imgDiv = "";
+            html = "<div class='card-body' style='flex:0.01 1;'>" +
+                "<h4 class='card-title text-info'>" + title + "</h4>" +
+                "<div class='carousel slide' data-ride='carousel' id='photos'>";
+
+            $.each(content, function (key, val) {
+                li += "<li data-target='#photos' data-slide-to='" + key + "' ";
+                if (key == 0) {
+                    li += "class='active'>";
+                } else {
+                    li += ">";
+                }
+                li += "</li>";
+
+
+                imgDiv += "<div class='carousel-item ";
+                if (key == 0) {
+                    imgDiv += "active'>";
+                } else {
+                    imgDiv += "'>";
+                }
+                imgDiv += "<img src='" + val.getUrl() + "' alt='Los Angeles' width='100%' height='300'>"
+                imgDiv += "</div>";
+            });
+
+            html += "<ul class='carousel-indicators'>" + li + "</ul>";
+            html += "<div class='carousel-inner'>" + imgDiv + "</div>";
+
+            html += "<a class='carousel-control-prev' href='#photos' data-slide='prev'>" +
+                "<span class='carousel-control-prev-icon'></span>" +
+                "</a>" +
+                "<a class='carousel-control-next' href='#photos' data-slide='next'>" +
+                "<span class='carousel-control-next-icon'></span>" +
+                "</a>" +
+                "</div>"
+        }
+        // } else if(title == "리뷰") {
+        //
+        // }
+    }
     return html;
 }
 /*
