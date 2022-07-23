@@ -96,6 +96,8 @@
         let map = null;
         let markers = []
         let northFacilityMarkers = []
+        let phyNetMarkers = [];
+        let flightPath = [];
         const VENDOR_COLORS = [
             [255, 0, 0],
             [0, 0, 255], // vendor #1
@@ -113,7 +115,7 @@
             center = { lat:postCoord[1], lng:postCoord[0] }
         }
         function initMap(listener) {
-            F_TEST_JSON = $.getJSON("{% static 'test.json' %}", null, function(data) {setTempMarkerGeomap(data, google)})
+            //F_TEST_JSON = $.getJSON("{% static 'test.json' %}", null, function(data) {setTempMarkerGeomap(data, google)})
             F_CLOSED_JSON = $.getJSON("{% static 'north_information.json' %}", null, setNorthFacilityMark)
             //37.63124, 127.2899 (seoul), 27.4673394037323, 112.0221605275621(후난성), 23.639397214043683, 81.15063376483022(인도 어딘가), 39.058678662262984, 125.76824421680736(김일성종합대학)
             map = new google.maps.Map(document.getElementById("map"), {
@@ -127,10 +129,17 @@
 
             map.addListener('click', (e) => getPlaceDetail(e));
             map.addListener('zoom_changed',function() {
-                if(map.getZoom() < 10) {
+                if(map.getZoom() < 7) {
                     hideAll(markers);
                     hideAll(northFacilityMarkers);
+
                 } else {
+                    if(map.getZoom() < 13) {
+                        $.each(Object.keys(phyNetMarkers), function (key, val) {
+                            hideAll(phyNetMarkers[val]);
+                            flightPath[val].setVisible(false);
+                        });
+                    }
                     markerShowAll(markers, map);
                     markerShowAll(northFacilityMarkers, map);
                 }

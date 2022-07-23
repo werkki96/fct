@@ -161,11 +161,11 @@ const LEGEND_ICONS = {
         name:"parking",
         openType:true,
     },
-    "bgp": {
-        url:STATIC_FOLDERS + "router.png",
-        name:"AS Router",
-        openType:true,
-    },
+    // "bgp": {
+    //     url:STATIC_FOLDERS + "router.png",
+    //     name:"AS Router",
+    //     openType:true,
+    // },
     nuclear: {
         url: STATIC_FOLDERS+"nuclear.png",
         name: "핵 관련 시설",
@@ -253,6 +253,7 @@ function getPlaceDetail(event) {
 }
 function callback(place, status) {
     if (status == google.maps.places.PlacesServiceStatus.OK) {
+
         let photo = place.photos;
         let addr = place.formatted_address;
         let call_num = place.formatted_phone_number;
@@ -306,6 +307,7 @@ function callback(place, status) {
 }
 function makeContent(title, content) {
     let html = "";
+
     if(typeof(content) != 'object') {
         html = "<div class='card-body' style='flex:0.01 1;'>" +
             "<h4 class='card-title text-info'>" + title + "</h4>" +
@@ -313,6 +315,7 @@ function makeContent(title, content) {
             "</div>";
     } else {
         if(title == "사진") {
+            testde = content;
             let li = "";
             let imgDiv = "";
             html = "<div class='card-body' style='flex:0.01 1;'>" +
@@ -335,8 +338,13 @@ function makeContent(title, content) {
                 } else {
                     imgDiv += "'>";
                 }
-                imgDiv += "<img src='" + val.getUrl() + "' alt='Los Angeles' width='100%' height='300'>"
-                imgDiv += "</div>";
+                if(typeof(val) != 'object') {
+                    imgDiv += "<img src='" + val + "' alt='Los Angeles' width='100%' height='300'>"
+                    imgDiv += "</div>";
+                } else {
+                    imgDiv += "<img src='" + val.getUrl() + "' alt='Los Angeles' width='100%' height='300'>"
+                    imgDiv += "</div>";
+                }
             });
 
             html += "<ul class='carousel-indicators'>" + li + "</ul>";
@@ -349,6 +357,13 @@ function makeContent(title, content) {
                 "<span class='carousel-control-next-icon'></span>" +
                 "</a>" +
                 "</div>"
+        } else if(title == "기사") {
+            html = "<div class='card-body' style='flex:0.01 1;'>" +
+                "<h4 class='card-title text-info'>" + title + "</h4>";
+            $.each(content, function (key, val) {
+                html += "<a href='"+val+"' target='_blank'>[" + key + "]</a> &nbsp;";
+            });
+            html += "</div>";
         }
         // } else if(title == "리뷰") {
         //
@@ -393,18 +408,11 @@ function goLogicalNetwork(coord, facility) {
 function setTempMarkerGeomap(json){
     myjson['test'] = json;
     $.each(json, function(key, val){
-        latlng = new google.maps.LatLng(val.path[val.path.length-1][1],val.path[val.path.length-1][0]);
+        let latlng = new google.maps.LatLng(val.path[val.path.length-1][1],val.path[val.path.length-1][0]);
         mark = new google.maps.Marker({
             position: latlng,
             icon: icons(google)['router'],
             map: map,
-            // label: {
-            //     text: val.location[val.location.length-1],
-            //     //color: "#000000",
-            //     fontWeight: "bold",
-            //     fontSize: "16px",
-            //     className: "marker-labels"
-            // },
             id:"test"
         });
         mark.addListener('click', (e) => getPlaceDetail(e))
@@ -426,11 +434,11 @@ function setTempMarkerGeomap(json){
 * */
 function setNorthFacilityMark(json){
     myjson['close'] = json;
-    console.log(json)
 
     $.each(json, function (key, val) {
         test = val;
-        latlng = new google.maps.LatLng(val.geo_info.lat, val.geo_info.lng);
+        let mark;
+        let latlng = new google.maps.LatLng(val.geo_info.lat, val.geo_info.lng);
         mark = new google.maps.Marker({
             position: latlng,
             icon: icons(google)[val.detail.type],
@@ -442,13 +450,91 @@ function setNorthFacilityMark(json){
                 fontSize: "16px",
                 className: "marker-labels"
             },
-            id: "test"
+            id: val.name,
         });
         //mark.addListener('click', (e) => getPlaceDetail(e))
         northFacilityMarkers.push(mark);
+        newPhyNetworkMarker(val.name, val.물리전)
+
+        mark.addListener('click', function (){
+            if(map.getZoom() < 17) {
+                map.setZoom(17);
+                map.setCenter(mark.getPosition())
+            }
+
+            markerShowAll(phyNetMarkers[val.name.replaceAll(" ","")], map)
+            flightPath[val.name.replaceAll(" ","")].setVisible(true);
+            flightPath[val.name.replaceAll(" ","")].setMap(map);
+            northCloseData(val);
+        });
     });
     if (map.getZoom() >= 10) markerShowAll(northFacilityMarkers, map)
     else hideAll(northFacilityMarkers)
+}
+function newPhyNetworkMarker(arrKey, coord) {
+    phyNetMarkers[arrKey.replaceAll(" ","")] = [];
+    $.each(coord, function (idx, latlng){
+        phyNetMarkers[arrKey.replaceAll(" ","")].push(
+            new google.maps.Marker({
+                position: latlng,
+                icon: icons(google)['pc'],
+                map: map,
+            })
+        );
+
+        flightPath[arrKey.replaceAll(" ","")] = null;
+        if(flightPath[arrKey.replaceAll(" ","")] == null) {
+            flightPath[arrKey.replaceAll(" ","")] = new google.maps.Polyline({
+                path: coord,
+                geodesic: true,
+                strokeColor: "#FF0000",
+                strokeOpacity: 1.0,
+                strokeWeight: 2,
+            });
+
+        }
+
+    });
+    hideAll(phyNetMarkers[arrKey.replaceAll(" ","")])
+
+}
+function northCloseData(place) {
+    let addr = place.geo_info.addr;
+    let location = place.geo_info; //lat, lng
+    let name = place.name;
+    let place_div = $('#place_detail');
+    place_div.empty();
+    if(name != null)
+        place_div.append(
+            "<div class='card-body' style='flex:0.01 1;'>" +
+            "<h3 class='card-title'>" + name + "</h3>" +
+            "</div>"
+        );
+    if(addr != null)
+        place_div.append(makeContent("주소", addr));
+    if(location != null)
+        place_div.append(makeContent("위경도", location.lat + ", " + location.lng));
+
+    $.each(place.detail, function(field_nm, val) {
+        if(val != null && field_nm != 'type')
+            place_div.append(makeContent(field_nm, val));
+    });
+
+    // 논리네트워크 뷰로 이동
+    place_div.append(makeContent("내부망 확인",
+        "<button class='btn btn-primary' onclick='goLogicalNetwork(" +
+        "\""+location.lat + ", " + location.lng+"\"" +
+        ",\""+name+"\")'>" +
+        "내부 네트워크 망 가시화" +
+        "</button>"));
+
+    if($('#mapDivs').hasClass('col-xl-9') && $('#mapDivs').hasClass('col-md-9')) {
+        place_div.removeClass('d-none')
+        $('#mapDivs').removeClass('col-xl-9')
+        $('#mapDivs').removeClass('col-md-9')
+        $('#mapDivs').addClass('col-xl-6')
+        $('#mapDivs').addClass('col-md-6')
+    }
 }
 /*
 * End set Marker for legends
