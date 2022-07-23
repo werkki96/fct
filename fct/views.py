@@ -34,8 +34,12 @@ def inner_network(request):
     return response
 
 def geomap(request):
+    coord = "";
+    if request.method == 'POST':
+        coord = request.POST['coord']
     context = {
         'm_keys': m_key,
+        'coord': coord,
     }
     response = render(request, 'GeoMap.html', context)
     return response

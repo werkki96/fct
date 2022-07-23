@@ -1,3 +1,4 @@
+
 const map_styles = [
     { elementType: "geometry", stylers: [{ color: "#242f3e" }] },
     { elementType: "labels.text.stroke", stylers: [{ color: "#242f3e" }] },
@@ -165,19 +166,57 @@ const LEGEND_ICONS = {
         name:"AS Router",
         openType:true,
     },
+    nuclear: {
+        url: STATIC_FOLDERS+"nuclear.png",
+        name: "핵 관련 시설",
+        openType: false,
+    },
+    university: {
+        url: STATIC_FOLDERS+"university.png",
+        name: "대학",
+        openType: false,
+    },
+    rocket: {
+        url: STATIC_FOLDERS+"missile.png",
+        name: "미사일발사장",
+        openType: false,
+    },
+    factory: {
+        url: STATIC_FOLDERS+"factory.png",
+        name: "공단/공장",
+        openType: false,
+    },
+    law_facility: {
+        url: STATIC_FOLDERS+"law_facility.png",
+        name: "법관련 시설",
+        openType: false,
+    },
 };
 function initLegends() {
     let tbl = $('.legends-list #openLocations');
+    let closeTbl = $('.legends-list #closeLocation');
     $.each(LEGEND_ICONS, function(key, val){
-        tbl.append(
-            "<tr>" +
-            "<td style='width:20%;' class='text-center'>" +
-            "<img src='" + val.url + "' alt='" + val.name + "' width='34.5' height='48'>" +
-            "</td>" +
-            "<td>" +
-            "<span class='text-dark font-weight-bold'>" + val.name + "</span>" +
-            "</td>" +
-            "</tr>");
+        if(val.openType == true) {
+            tbl.append(
+                "<tr>" +
+                "<td style='width:20%;' class='text-center'>" +
+                "<img src='" + val.url + "' alt='" + val.name + "' width='34.5' height='48'>" +
+                "</td>" +
+                "<td>" +
+                "<span class='text-dark font-weight-bold'>" + val.name + "</span>" +
+                "</td>" +
+                "</tr>");
+        } else {
+            closeTbl.append(
+                "<tr>" +
+                "<td style='width:20%;' class='text-center'>" +
+                "<img src='" + val.url + "' alt='" + val.name + "' width='34.5' height='48'>" +
+                "</td>" +
+                "<td>" +
+                "<span class='text-dark font-weight-bold'>" + val.name + "</span>" +
+                "</td>" +
+                "</tr>");
+        }
     });
     tbl.parent().height($('#map').height())
     tbl.parent().css('overflow','auto')
@@ -194,7 +233,6 @@ function initLegends() {
 * */
 let testde;
 function getPlaceDetail(event) {
-
     if(event.placeId) {
         // usable fields: address_components, formatted_address, business_status, formatted_phone_number, geometry
         // plus_code, icon, international_phone_number, name, opening_hours
@@ -248,6 +286,14 @@ function callback(place, status) {
             place_div.append(makeContent("구글지도에서 보기", "<a href='"+gmap_url+"' class='text-primary'>"+gmap_url+"</a>"));
         if(photo != undefined)
             place_div.append(makeContent("사진", photo));
+
+        // 논리네트워크 뷰로 이동
+        place_div.append(makeContent("내부망 확인",
+            "<button class='btn btn-primary' onclick='goLogicalNetwork(" +
+            "\""+location.lat() + ", " + location.lng()+"\"" +
+            ",\""+name+"\")'>" +
+            "내부 네트워크 망 가시화" +
+            "</button>"));
 
         if($('#mapDivs').hasClass('col-xl-9') && $('#mapDivs').hasClass('col-md-9')) {
             place_div.removeClass('d-none')
@@ -310,36 +356,150 @@ function makeContent(title, content) {
     }
     return html;
 }
+
+function goLogicalNetwork(coord, facility) {
+    let f=document.createElement('form');
+
+    let input_coord;
+    input_coord=document.createElement('input');
+    input_coord.setAttribute('type','hidden');
+    input_coord.setAttribute('name','coord');
+    input_coord.setAttribute('value', coord);
+    let input_fac;
+    input_fac=document.createElement('input');
+    input_fac.setAttribute('type','hidden');
+    input_fac.setAttribute('name','facility');
+    input_fac.setAttribute('value', facility);
+
+    f.appendChild(input_coord);
+    f.appendChild(input_fac);
+    f.innerHTML = f.innerHTML+CSRF;
+    f.setAttribute('method','post');
+    f.setAttribute('action','logical_view_2d');
+    document.body.appendChild(f);
+    f.submit();
+}
 /*
 * End get place detail
 * */
 
+/*
+* Start set Marker for legends
+* use: GeoMap.html
+* writer: 장지수
+* update: 2022/07/23
+* comment: 수정 필요함. 위협트래픽>geomap으로 들어왔을때 주변 가시화 용도로만 됨 현재는(중간데이터가 없음)
+* */
+function setTempMarkerGeomap(json){
+    myjson['test'] = json;
+    $.each(json, function(key, val){
+        latlng = new google.maps.LatLng(val.path[val.path.length-1][1],val.path[val.path.length-1][0]);
+        mark = new google.maps.Marker({
+            position: latlng,
+            icon: icons(google)['router'],
+            map: map,
+            // label: {
+            //     text: val.location[val.location.length-1],
+            //     //color: "#000000",
+            //     fontWeight: "bold",
+            //     fontSize: "16px",
+            //     className: "marker-labels"
+            // },
+            id:"test"
+        });
+        mark.addListener('click', (e) => getPlaceDetail(e))
+        markers.push(mark);
+    });
+    if(map.getZoom() >= 7)  markerShowAll(markers, map)
+    else hideAll(markers)
+}
+/*
+* End set Marker for legends
+* */
+
+/*
+* Start set Marker for north facility
+* use: GeoMap.html
+* writer: 장지수
+* update: 2022/07/23
+* comment: 수정 필요함.
+* */
+function setNorthFacilityMark(json){
+    myjson['close'] = json;
+    console.log(json)
+
+    $.each(json, function (key, val) {
+        test = val;
+        latlng = new google.maps.LatLng(val.geo_info.lat, val.geo_info.lng);
+        mark = new google.maps.Marker({
+            position: latlng,
+            icon: icons(google)[val.detail.type],
+            map: map,
+            label: {
+                text: val.name,
+                //color: "#000000",
+                fontWeight: "bold",
+                fontSize: "16px",
+                className: "marker-labels"
+            },
+            id: "test"
+        });
+        //mark.addListener('click', (e) => getPlaceDetail(e))
+        northFacilityMarkers.push(mark);
+    });
+    if (map.getZoom() >= 10) markerShowAll(northFacilityMarkers, map)
+    else hideAll(northFacilityMarkers)
+}
+/*
+* End set Marker for legends
+* */
 //{# 아이콘 정의 #}
 const icons =  function(google) {
     return {
         nuclear: {
-            url: "/static/img/icons/nuclear.png",
+            url: STATIC_FOLDERS+"nuclear.png",
             size: new google.maps.Size(90, 90),
             origin: new google.maps.Point(0, 0),
             anchor: new google.maps.Point(17, 34),
             scaledSize: new google.maps.Size(30, 30),
         },
         n_school: {
-            url: "/static/img/icons/nuclear_negative.png",
+            url: STATIC_FOLDERS+"nuclear_negative.png",
             size: new google.maps.Size(90, 90),
             origin: new google.maps.Point(0, 0),
             anchor: new google.maps.Point(17, 34),
             scaledSize: new google.maps.Size(40, 40),
         },
-        school: {
-            url: "/static/img/icons/school_negative.png",
+        university: {
+            url: STATIC_FOLDERS+"university.png",
+            size: new google.maps.Size(90, 90),
+            origin: new google.maps.Point(0, 0),
+            anchor: new google.maps.Point(17, 34),
+            scaledSize: new google.maps.Size(40, 40),
+        },
+        rocket: {
+            url: STATIC_FOLDERS+"missile.png",
+            size: new google.maps.Size(90, 90),
+            origin: new google.maps.Point(0, 0),
+            anchor: new google.maps.Point(17, 34),
+            scaledSize: new google.maps.Size(40, 40),
+        },
+        factory: {
+            url: STATIC_FOLDERS+"factory.png",
+            size: new google.maps.Size(90, 90),
+            origin: new google.maps.Point(0, 0),
+            anchor: new google.maps.Point(17, 34),
+            scaledSize: new google.maps.Size(40, 40),
+        },
+        law_facility: {
+            url: STATIC_FOLDERS+"law_facility.png",
             size: new google.maps.Size(90, 90),
             origin: new google.maps.Point(0, 0),
             anchor: new google.maps.Point(17, 34),
             scaledSize: new google.maps.Size(40, 40),
         },
         pc: {
-            url: "/static/img/icons/PC.png",
+            url: STATIC_FOLDERS+"PC.png",
             size: new google.maps.Size(71, 71),
             origin: new google.maps.Point(0, 0),
             anchor: new google.maps.Point(17, 34),
@@ -347,14 +507,14 @@ const icons =  function(google) {
             labelOrigin: new google.maps.Point(70, 20),
         },
         server: {
-            url: "/static/img/icons/server.png",
+            url: STATIC_FOLDERS+"server.png",
             size: new google.maps.Size(100, 120),
             origin: new google.maps.Point(0, 0),
             anchor: new google.maps.Point(17, 34),
             scaledSize: new google.maps.Size(40, 40)
         },
         router: {
-            url: "/static/img/icons/router.png",
+            url: STATIC_FOLDERS+"router.png",
             size: new google.maps.Size(71, 71),
             origin: new google.maps.Point(0, 0),
             anchor: new google.maps.Point(15, 30),
@@ -380,17 +540,16 @@ function openLogDetail(json) {
             $('#threatDetailDiv').removeClass('d-none')
         }
     }
-    console.log(json)
 
     for(let i = 0;i<json.path.length-1;i++) {
         threat_type = "네트워크 경유"
         if (i == json.timestamps.length - 1) threat_type = "위협발생"
         // 1 row
         table.append(
-            '<tr>' +
-            '<td style="width:5%;">'+i+'</td>' +
-            '<td style="width:30%;">'+json.location[i]+'</td>' +
-            '<td style="width:30%;">'+json.location[i+1]+'</td>' +
+            '<tr style="background-color:lightgray;">' +
+            '<td style="width:5%;">'+(i+1)+'</td>' +
+            '<td style="width:25%;">'+json.location[i]+'</td>' +
+            '<td style="width:25%;">'+json.location[i+1]+'</td>' +
             '<td>'+threat_type+'</td>' +
             '</tr>');
         // 2 row
@@ -398,9 +557,9 @@ function openLogDetail(json) {
             '<tr>' +
             '<td>'+json.location[i]+'</td>' +
             '<td colspan="3">' +
-            'ip: ' + json.location[i] +
+            // 'ip: ' + json.location[i] +
             '<br>위경도: ' + json.path[i][0] + ', ' + json.path[i][1] +
-            '<br>소유자 : ???' +
+            '<br>소유자 : 미공개' +
             '<br>트래픽 전송 시간: ' + json.timestamps[i] +
             '</td>' +
             '</tr>');
@@ -409,13 +568,39 @@ function openLogDetail(json) {
             '<tr>' +
             '<td>'+json.location[i+1]+'</td>' +
             '<td colspan="3">' +
-            'ip: ' + json.location[i+1] +
-            '<br>위경도: ' + json.path[i+1][0] + ', ' + json.path[i+1][1] +
-            '<br>소유자 : ???' +
+            // 'ip: ' + json.location[i+1] +
+            '<br>위경도: ' + json.path[i+1] +
+            '<br>소유자 : 미공개' +
             '<br>트래픽 전송 시간: ' + json.timestamps[i+1] +
             '</td>' +
             '</tr>');
     }
+    table.append(
+        '<tr>' +
+        '<td colspan="4" class="text-center">' +
+        '<button class="btn btn-success" onclick="goGeoMapView(\''+json.path[json.path.length-1]+'\')">' +
+        json.location[json.location.length-1]+' 지형정보 확인' +
+        '</button>' +
+        '</td>' +
+        '</tr>');
+}
+
+function goGeoMapView(coord) {
+    console.log(coord);
+    let f=document.createElement('form');
+
+    let obj;
+    obj=document.createElement('input');
+    obj.setAttribute('type','hidden');
+    obj.setAttribute('name','coord');
+    obj.setAttribute('value', coord);
+
+    f.appendChild(obj);
+    f.innerHTML = f.innerHTML+CSRF;
+    f.setAttribute('method','post');
+    f.setAttribute('action','GeoMap');
+    document.body.appendChild(f);
+    f.submit();
 }
 
 function closeLogDetail() {
@@ -520,9 +705,9 @@ function coordinate(json){
 
     for(i = 0; i < json.length; i++){
         coordi[i] = [{ lat : json[i].path[0][1], lng: json[i].path[0][0]},
-                     { lat : json[i].path[1][1], lng: json[i].path[1][0]},
-                     { lat : json[i].path[2][1], lng: json[i].path[2][0]},
-                     { lat : json[i].path[3][1], lng: json[i].path[3][0]}]
+            { lat : json[i].path[1][1], lng: json[i].path[1][0]},
+            { lat : json[i].path[2][1], lng: json[i].path[2][0]},
+            { lat : json[i].path[3][1], lng: json[i].path[3][0]}]
     }
     return coordi
 }
@@ -537,11 +722,12 @@ let aniHandler;
 * writer: 장지수
 * update: 2022/07/21
 * */
+
 function AnimationOverlayView(json) {
     // {# animate map #}
     let tbl = $('#tb_threat_log tbody');
     coordi = coordinate(json)
-    loop_length = json[0].timestamps[json[0].timestamps.length-1]+100
+    loop_length = json[0].timestamps[json[0].timestamps.length-1]+200
     //console.log(loop_length)
     let currentTime = 0;
     let props = {
@@ -559,15 +745,18 @@ function AnimationOverlayView(json) {
         rounded:true,
     };
     show = function(index) {
-        for(i = 0; i < coordi.length; i++){
+        for(let i = 0; i < coordi.length; i++){
             markers[i][index].setMap(map);
         }
     }
 
     const overlay = new GoogleMapsOverlay({});
+    for(let i = 0; i < json.length; i ++){
+        markers[i] = newMarkers(json[i].location.length, json[i].location, coordi[i])
+    }
 
     const animate = () => {
-        //console.log(props)
+
         let tripsLayer = new TripsLayer({
             ...props,
             currentTime,
@@ -576,39 +765,27 @@ function AnimationOverlayView(json) {
             layers: [tripsLayer],
         });
         currentTime = (currentTime + 1) % loop_length;
-
-        if(map.getZoom() < 10) {
-            if (currentTime == json[0].timestamps[j]) {
-                show(j)
-                if (j > 0 && j < json[0].timestamps.length) {
-                    threat_type = "네트워크 경유"
-                    if (j == json[0].timestamps.length - 1) threat_type = "위협발생"
-                    for(i = 0; i < markers.length; i++){
-                    tbl.append(AddLog(json[i].location[j - 1], json[i].location[j], threat_type, json[i]));
-                    }
-                    tbl.parent().parent().height($('#map').height());
-                    tbl.parent().parent().css('overflow', 'auto');
+        $.each(json, function(idx, val){
+            let threat_type = "네트워크 경유"
+            $.each(val.timestamps, function(tidx, times){
+                if (currentTime == times) {
+                    if(val.location[tidx] == "북한") threat_type = "위협 트래픽 발생";
+                    if(val.location[tidx+1] != undefined)
+                        tbl.append(AddLog(val.location[tidx], val.location[tidx+1], threat_type, val));
+                    markers[idx][tidx].setMap(map);
                 }
-                if (j > 1){
-                    for(let i = 0; i < coordi.length; i++){
-                        markers[i][j-2].setMap(null);
-                    }
+                if(markers[idx][tidx-2] != undefined && currentTime == val.timestamps[tidx] && tidx > 1){
+                    markers[idx][tidx-2].setMap(null);
                 }
-
-                // for(let i = 1; i < coordi.length; i++){
-                //     markers[i][j].setAnimation(google.maps.Animation.BOUNCE)
-                // }
-                j++;
-            } else if (currentTime == loop_length - 1) {
-
+            })
+        });
+        if (currentTime == loop_length - 1) {
             for (let i = 0; i < coordi.length; i++){
                 for (let j = 0; j < coordi[i].length; j++){
                     markers[i][j].setMap(null);
                 }
             }
-                $('#tb_threat_log tbody').empty();
-                j = 0;
-            }
+            $('#tb_threat_log tbody').empty();
         }
         if(!flag) {
             aniHandler = window.requestAnimationFrame(animate);
@@ -626,18 +803,6 @@ function AnimationOverlayView(json) {
         }
     }
 
-    let j = 0;
-    //$('#tb_threat_log').text('')
-    // {# new create markers #}
-
-
-    if(map.getZoom() < 10) {
-        var markers = [];
-        for(let i = 0; i < json.length; i ++){
-            markers[i] = newMarkers(json[i].location.length, json[i].location, coordi[i])
-        }
-
-    }
 
 
     for(let i = 0; i < json.length; i++){
@@ -649,60 +814,60 @@ function AnimationOverlayView(json) {
         hideAll(markers[i]);
     }
 
-    // {# marker zoom up event #}
-    markers[0][3].addListener("click", (e) => {
-        map.setCenter(markers[0][3].getPosition());
-        animateMapZoomTo(map, 18)
-        map.setZoom(18)
-        hideAll(markers)
-        flag = true
-    });
+    // // {# marker zoom up event #}
+    // markers[0][3].addListener("click", (e) => {
+    //     map.setCenter(markers[0][3].getPosition());
+    //     animateMapZoomTo(map, 18)
+    //     map.setZoom(18)
+    //     hideAll(markers)
+    //     flag = true
+    // });
 
 
     flightPath = null;
     // {# marker zoom up event #}
-    map.addListener("zoom_changed", (e) => {
-        //줌했을때 물리노드 보이는 좌표
-        zoomTarget = [markers[0][3],
-            {lat:39.05807855450129, lng:125.76711363450084},
-            {lat:39.05934347236878, lng:125.77019746627538},
-            {lat:39.05628854814572, lng:125.7673594819969},
-            {lat:39.05695679415487, lng:125.77108898847766}]
-        zoomTarget = zoomTarget.concat([zoomTarget[0], zoomTarget[2], zoomTarget[4], zoomTarget[1], zoomTarget[3], zoomTarget[0]])
-        if(flightPath == null) {
-            flightPath = new google.maps.Polyline({
-                path: zoomTarget,
-                geodesic: true,
-                strokeColor: "#FF0000",
-                strokeOpacity: 1.0,
-                strokeWeight: 2,
-            });
-        }
-        if(map.zoom > 14) {
-            if(markers2 == ''){
-                markers2 = newMarkers(5, ["종합대학","혁명사적관","학생빌딩","과학도서관",".."], zoomTarget);
-            }
-            markerShowAll(markers2, map)
-
-            flightPath.setVisible(true);
-            flightPath.setMap(map);
-            flag = true;
-        } else if (map.zoom < 10) {
-            hideAll(markers2)
-            //markerShowAll(markers, map)
-            if(flag == true) {
-                aniHandler = window.requestAnimationFrame(animate);
-
-            }
-            //markers = newMarkers(json[0].location.length, json[0].location, target)
-            flag = false;
-        }else {
-            hideAll(markers[0])
-            hideAll(markers2)
-            flightPath.setVisible(false)
-        }
-
-    });
+    // map.addListener("zoom_changed", (e) => {
+    //     //줌했을때 물리노드 보이는 좌표
+    //     zoomTarget = [markers[0][3],
+    //         {lat:39.05807855450129, lng:125.76711363450084},
+    //         {lat:39.05934347236878, lng:125.77019746627538},
+    //         {lat:39.05628854814572, lng:125.7673594819969},
+    //         {lat:39.05695679415487, lng:125.77108898847766}]
+    //     zoomTarget = zoomTarget.concat([zoomTarget[0], zoomTarget[2], zoomTarget[4], zoomTarget[1], zoomTarget[3], zoomTarget[0]])
+    //     if(flightPath == null) {
+    //         flightPath = new google.maps.Polyline({
+    //             path: zoomTarget,
+    //             geodesic: true,
+    //             strokeColor: "#FF0000",
+    //             strokeOpacity: 1.0,
+    //             strokeWeight: 2,
+    //         });
+    //     }
+    //     if(map.zoom > 14) {
+    //         if(markers2 == ''){
+    //             markers2 = newMarkers(5, ["종합대학","혁명사적관","학생빌딩","과학도서관",".."], zoomTarget);
+    //         }
+    //         markerShowAll(markers2, map)
+    //
+    //         flightPath.setVisible(true);
+    //         flightPath.setMap(map);
+    //         flag = true;
+    //     } else if (map.zoom < 10) {
+    //         hideAll(markers2)
+    //         //markerShowAll(markers, map)
+    //         if(flag == true) {
+    //             aniHandler = window.requestAnimationFrame(animate);
+    //
+    //         }
+    //         //markers = newMarkers(json[0].location.length, json[0].location, target)
+    //         flag = false;
+    //     }else {
+    //         hideAll(markers[0])
+    //         hideAll(markers2)
+    //         flightPath.setVisible(false)
+    //     }
+    //
+    // });
     window.requestAnimationFrame(animate);
 
     return overlay;

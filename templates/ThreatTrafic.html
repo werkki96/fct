@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% load static %}
 {% block content %}
+
     <!-- partial -->
     <div class="main-panel">
         <div class="content-wrapper">
@@ -11,7 +12,7 @@
                             <div class="d-flex flex-row justify-content-between">
                                 <h4 class="card-title">위협 로그</h4>
                             </div>
-                            <div class="preview-list">
+                            <div class="preview-list" style="max-height:800px; overflow: auto;">
                                 <table class="table" id="tb_threat_log">
                                     <tbody></tbody>
                                 </table>
@@ -31,12 +32,15 @@
                 <div class="col-md-12 col-xl-3 grid-margin stretch-card d-none" id="threatDetailDiv">
                     <div class="card">
                         <div class="card-body">
-                            <table class="table" id="tb_threat_log_detail">
-                                <tr>
-                                    <td colspan="3">위협 트래픽 상세</td>
-                                    <td class="text-right"><a href="javascript:closeLogDetail();"><i class="align-middle" data-feather="minus"></i></a></td>
-                                </tr>
-                            </table>
+                            <div class="d-flex flex-row justify-content-between">
+                                <h4 class="card-title">위협 트래픽 상세</h4>
+                                <a href="javascript:closeLogDetail();"><i class="align-middle" data-feather="minus"></i></a>
+                            </div>
+                            <div style="max-height:800px; overflow-y: auto;overflow-x: hidden;">
+                                <table class="table" id="tb_threat_log_detail">
+                                    <tbody></tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -57,9 +61,9 @@
     {#  <script type="text/javascript" src="{% static 'test.json'%}"></script>#}
     <script>
         let overlays;
-        var DIR = "{% static 'img/refresh-cl/'%}";
+        let DIR = "{% static 'img/refresh-cl/'%}";
         // Called when the Visualization API is loaded.
-
+        const CSRF = '{% csrf_token %}';
         const GoogleMapsOverlay = deck.GoogleMapsOverlay;
         const TripsLayer = deck.TripsLayer;
         const DATA_URL = "{% static 'test.json' %}";
@@ -77,35 +81,9 @@
         show = null;
         flag = false;
         const target = [{ lat: 37.63124, lng: 127.2899 }, { lat: 27.4673394037323, lng: 112.0221605275621 }, { lat: 23.639397214043683, lng: 81.15063376483022 }, { lat: 39.058678662262984, lng: 125.76824421680736 }];
-        const target_2 = [{ lat: 55.76633, lng:37.63332 }, { lat: 27.4673394037323, lng: 112.0221605275621 }, { lat: 22.29579, lng: 114.13927 },  { lat : 37.92935, lng : 126.62565}];
-        const target_3 = [{ lat: 51.4510898289427, lng: -1.7277438152626 }, { lat: 27.4673394037323, lng: 112.0221605275621 }, { lat: 22.29579, lng: 114.13927 }, { lat : 39.79758, lng : 125.75486 } ];
-        const target_4 = [{ lat: 34.3710341583988, lng: 136.907403270728 }, { lat: 27.4673394037323, lng: 112.0221605275621 }, { lat: 22.29579, lng: 114.13927 }, { lat : 40.95853, lng : 126.60763 }];
-        const target_5 = [{ lat: 11.54629, lng: 104.93112 }, { lat : 59.32393, lng : 18.06198  }, { lat: 22.29579, lng: 114.13927 }, { lat : 39.02117, lng : 125.75305 }];
-        const target_6 = [{ lat: 14.60311, lng: 120.98620 }, { lat : 37.63124, lng : 127.2899  }, { lat: 36.4795689911018, lng: 117.091754899661 }, { lat: 39.058678662262984, lng: 125.76824421680736 }];
-        const target_7 = [{ lat: 30.11246, lng: 31.20469 }, { lat: 46.97053, lng: 7.44797  }, { lat: 55.76633, lng:37.63332 }, { lat: 39.058678662262984, lng: 125.76824421680736 }];
-        const target_8 = [{ lat : 41.92704, lng : 12.44452 }, { lat: 38.90535, lng: -77.03427  }, { lat: 55.76633, lng:37.63332 }, { lat : 39.79758, lng : 125.75486 }];
-        const target_9 = [{ lat : -35.30468, lng : 149.11818 }, { lat: 38.90535, lng: -77.03427  }, { lat: 55.76633, lng:37.63332 }, { lat : 37.92935, lng : 126.62565 }];
-        const target_10 = [{ lat: -29.21951, lng: 26.08857 }, { lat: 38.90535, lng: -77.03427  }, { lat: 55.76633, lng:37.63332 }, { lat : 37.92935, lng : 126.62565 }];
-        const target_11 = [{ lat: 45.55459, lng: -75.72917 }, { lat : 59.32393, lng : 18.06198  }, { lat: 55.76633, lng:37.63332 }, { lat : 37.92935, lng : 126.62565 }];
-        const target_12 = [{ lat : -41.29896, lng : 174.78678 }, { lat : 34.04533, lng : -118.25571  }, { lat: 55.76633, lng:37.63332 }, { lat : 37.92935, lng : 126.62565 }];
-        const target_13 = [{ lat : 59.32393, lng : 18.06198 }, { lat : 34.04533, lng : -118.25571  }, { lat: 22.29579, lng: 114.13927 }, { lat : 40.95853, lng : 126.60763 }];
-        const target_14 = [{ lat : -15.68335, lng : -47.80003 }, { lat : 59.32393, lng : 18.06198  }, { lat: 22.29579, lng: 114.13927 }, { lat : 40.95853, lng : 126.60763 }];
-        const target_15 = [{ lat : -12.00122, lng : -77.00774 }, { lat :4.74056, lng : -74.04241 }, { lat: 55.76633, lng:37.63332 }, { lat : 40, lng : 127 }];
-        const target_16 = [{ lat :59.98176, lng : 10.58528 }, { lat: 38.90535, lng: -77.03427 }, { lat: 55.76633, lng:37.63332 }, { lat : 40, lng : 127 }];
+
         //const temp = [ { lat: 39.058678662262984, lng: 125.76824421680736 }, { lat: 40.058678662262984, lng: 125.76824421680736 }, { lat: 39.058678662262984, lng: 126.76824421680736 }, { lat: 39.158678662262984, lng: 125.76824421680736 },{ lat: 39.858678662262984, lng: 125.06824421680736 },{ lat: 39.77678662262984, lng: 125.00824421680736 },{ lat: 39.058678662262984, lng: 125.76824421680736 },{ lat: 39.058678662262984, lng: 125.76824421680736 }];
 
-        function initMap(listener) {
-            //37.63124, 127.2899 (seoul), 27.4673394037323, 112.0221605275621(후난성), 23.639397214043683, 81.15063376483022(인도 어딘가), 39.058678662262984, 125.76824421680736(김일성종합대학)
-            map = new google.maps.Map(document.getElementById("map"), {
-                zoom: 4,
-                center: target[0],
-                {#styles: map_styles,#}
-                mapTypeId: "hybrid",
-                minZoom:3,
-            });
-        }
-
-        window.initMap = initMap;
         function ThreatAnimationLayer(){
             overlay = AnimationOverlayView(JSONS.responseJSON)
             overlay.setMap(map);
@@ -113,9 +91,20 @@
             //markerShowAll(markers, map)
             //markers = newMarkers(temp.length, temp, temp)
         }
-        setTimeout(function(){
+
+        function initMap(listener) {
+            //37.63124, 127.2899 (seoul), 27.4673394037323, 112.0221605275621(후난성), 23.639397214043683, 81.15063376483022(인도 어딘가), 39.058678662262984, 125.76824421680736(김일성종합대학)
+            map = new google.maps.Map(document.getElementById("map"), {
+                zoom: 4,
+                center: target[0],
+                {#styles: map_styles,#}
+                mapTypeId: 'roadmap'/*"hybrid"*/,
+                minZoom:3,
+            });
             ThreatAnimationLayer()
-        },500)
+        }
+
+        window.initMap = initMap;
 
     </script>
 {% endblock %}
