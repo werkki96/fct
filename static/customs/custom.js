@@ -972,3 +972,34 @@ function markerShowAll(mark, map) {
         mark[i].setMap(map);
     }
 }
+
+
+
+/*
+* Start Execute 3D Logical View program
+* use: logical_view_2d.html
+* writer: 장지수
+* update: 2022/07/25
+* comment: 추후 데이터 연동방식 바꾸면서 없어질 수 있음
+* */
+function openLogical3DView(csrf) {
+    $.ajax({
+        headers: {
+            'X-CSRFTOKEN' : csrf
+        },
+        type : "POST",            // HTTP method type(GET, POST) 형식이다.
+        url : "/logical_view_3d",      // 컨트롤러에서 대기중인 URL 주소이다.
+        data : {'ok':"ok"},            // Json 형식의 데이터이다.
+        success : function(res){ // 비동기통신의 성공일경우 success콜백으로 들어옵니다. 'res'는 응답받은 데이터이다.
+            // 응답코드 > 0000
+            console.log(res);
+        },
+        error : function(XMLHttpRequest, textStatus, errorThrown){ // 비동기 통신이 실패할경우 error 콜백으로 들어옵니다.
+            console.log("통신 실패.")
+        }
+    });
+}
+
+/*
+* End Map Overlay Animation Traffic
+* */

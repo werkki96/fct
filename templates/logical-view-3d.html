@@ -1,13 +1,8 @@
-<!DOCTYPE html>
-<html lang="en-us">
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <title>Unity WebGL Player | NTV</title>
-  </head>
-  <body style="text-align: center">
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
     <canvas id="unity-canvas" width=1920 height=1080 style="width: 1920px; height: 1080px; background: #231F20"></canvas>
-    <script src="Build/Build 1.0.loader.js"></script>
+    <script src="{% static "Build" %}/Build 1.0.loader.js"></script>
     <script>
       if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
         // Mobile device style: fill the whole browser client area with the game canvas:
@@ -18,10 +13,10 @@
       }
 
       createUnityInstance(document.querySelector("#unity-canvas"), {
-        dataUrl: "Build/Build 1.0.data.unityweb",
-        frameworkUrl: "Build/Build 1.0.framework.js.unityweb",
-        codeUrl: "Build/Build 1.0.wasm.unityweb",
-        streamingAssetsUrl: "StreamingAssets",
+        dataUrl: "{% static "Build" %}/Build 1.0.data.unityweb",
+        frameworkUrl: "{% static "Build" %}/Build 1.0.framework.js.unityweb",
+        codeUrl: "{% static "Build" %}/Build 1.0.wasm.unityweb",
+        streamingAssetsUrl: "{% static "StreamingAssets" %}",
         companyName: "Milab",
         productName: "NTV",
         productVersion: "0.1",
@@ -29,5 +24,4 @@
         // devicePixelRatio: 1, // Uncomment this to override low DPI rendering on high DPI displays.
       });
     </script>
-  </body>
-</html>
+{% endblock %}

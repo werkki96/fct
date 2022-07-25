@@ -62,9 +62,6 @@ def base(request):
 
 # 관심지역 내 내부망 가시화
 def logical_view_2d(request):
-    context = {
-        'm_keys': m_key,
-    }
     if request.method == 'POST':
         facility = request.POST['facility']
         coord = request.POST['coord']
@@ -75,3 +72,23 @@ def logical_view_2d(request):
         }
     response = render(request, 'logical-view-2d.html', context)
     return response
+
+# 관심지역 내 내부망 가시화(3D)
+from django.http import JsonResponse
+import subprocess
+from pathlib import Path
+def logical_view_3d(request):
+    #if request.method == 'POST':
+      #  facility = request.POST['facility']
+       # coord = request.POST['coord']
+    # context = {
+    # #    'm_keys': m_key,
+    # #    'facility': facility,
+    # #    'coord': coord
+    # }
+    # response = render(request, 'logical-view-3d.html', context)
+    # return response
+    BASE_DIR = Path(__file__).resolve().parent.parent
+    subprocess.call([BASE_DIR.__str__()+"/3d_Logical_view/NTV.exe"])
+
+    return JsonResponse({"ok":"ok"})
